@@ -8,6 +8,7 @@ namespace ThreadCollor
 {
     class FileEntry
     {
+        private int entryNumber = -1;
         private string fileName;
         private string filePath;
         private string status = "Waiting";
@@ -23,6 +24,11 @@ namespace ThreadCollor
         }
 
         #region Get
+        public int getEntryNumber()
+        {
+            return entryNumber;
+        }
+
         public string getFileName()
         {
             return fileName;
@@ -88,6 +94,11 @@ namespace ThreadCollor
         #endregion
 
         #region Set
+        public void setEntryNumber(int entryNumber)
+        {
+            this.entryNumber = entryNumber;
+        }
+
         public void setStatus(string status)
         {
             //Update the status if the new status is Waiting or Finished

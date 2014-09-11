@@ -10,7 +10,7 @@ namespace ThreadCollor
 {
     class OLD_ThreadManager
     {
-        Queue<KeyValuePair<string, int>> taskList;
+        Queue<FileEntry> taskList;
         BackgroundWorker[] workers;
         //static bool runFlag;
 
@@ -32,7 +32,7 @@ namespace ThreadCollor
             }
         }
 
-        public void start(Queue<KeyValuePair<string, int>> taskList)
+        public void start(Queue<FileEntry> taskList)
         {
             this.taskList = taskList;
 

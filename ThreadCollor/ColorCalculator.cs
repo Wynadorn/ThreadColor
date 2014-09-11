@@ -13,9 +13,9 @@ namespace ThreadCollor
     {
         private ListView listView_overview;
         private Dictionary<string, int> result;
-        private Queue<KeyValuePair<string, int>> taskList;
+        private Queue<FileEntry> taskList;
 
-        public ColorCalculator(ListView listView_overview, Queue<KeyValuePair<string, int>> taskList)
+        public ColorCalculator(ListView listView_overview, Queue<FileEntry> taskList)
         {
             this.taskList = taskList;
             this.listView_overview = listView_overview;

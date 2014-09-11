@@ -19,7 +19,7 @@ namespace ThreadCollor
         **/
         #region Variable declarations
             //A list containing references to all the tasks that have to be done
-            private static Queue<KeyValuePair<string, int>> taskList = new Queue<KeyValuePair<string, int>>();
+            private static Queue<FileEntry> taskList = new Queue<FileEntry>();
             //Only column width changed after the form load event should be saved
             private static List<FileEntry> backlog_overview = new List<FileEntry>();
 
@@ -60,6 +60,7 @@ namespace ThreadCollor
                     newEntry.SubItems[6].Text = String.Empty;
                 }
                 listView_overview.Items.Add(newEntry);
+                backlog_entry.setEntryNumber(i);
             }
             if(listView_overview.Items.Count > 0)
             {
@@ -102,9 +103,10 @@ namespace ThreadCollor
                 //Add the files to the backlog
                 foreach(string filepath in selectedFiles)
                 {
-                    backlog_overview.Add(new FileEntry(System.IO.Path.GetFileName(filepath), filepath));
+                    FileEntry fileEntry = new FileEntry(System.IO.Path.GetFileName(filepath), filepath);
 
-                    taskList.Enqueue(new KeyValuePair<string, int>("filepath", 1));
+                    backlog_overview.Add(fileEntry);
+                    taskList.Enqueue(fileEntry);
                 }
 
                 updateOverview();

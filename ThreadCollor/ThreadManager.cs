@@ -11,7 +11,7 @@ namespace ThreadCollor
 {
     class ThreadManager
     {
-        Queue<KeyValuePair<string, int>> taskList;
+        Queue<FileEntry> taskList;
         ColorCalculator[] workers;
         ListView listView_overview;
 
@@ -20,7 +20,7 @@ namespace ThreadCollor
             this.listView_overview = listView_overview;
         }
 
-        public void startThreads(Queue<KeyValuePair<string, int>> taskList, int numberOfThreads)
+        public void startThreads(Queue<FileEntry> taskList, int numberOfThreads)
         {
             //Create a local copy of the task list
             this.taskList = taskList;
