@@ -61,9 +61,31 @@ namespace ThreadCollor
                 }
                 listView_overview.Items.Add(newEntry);
             }
-            listView_overview.Update();
-            listView_overview.Refresh();
-            listView_overview.EnsureVisible(listView_overview.Items.Count - 1);
+            if(listView_overview.Items.Count > 0)
+            {
+                listView_overview.Update();
+                listView_overview.Refresh();
+                listView_overview.EnsureVisible(listView_overview.Items.Count - 1);
+            }
+        }
+
+        private List<String> askForFiles()
+        {
+            // Create an instance of the open file dialog box.
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+
+            // Set filter options and filter index.
+            openFileDialog.Filter = "png (.png)|*.png|All Files (*.*)|*.*";
+            openFileDialog.FilterIndex = 1;
+            //Allows the user to select multiple files
+            openFileDialog.Multiselect = true;
+
+            // Call the ShowDialog method to show the dialog box wherein the user can select files.
+            openFileDialog.ShowDialog();
+
+            //Put the dialog results into a list
+            //This list will contain file paths
+            return openFileDialog.FileNames.ToList();
         }
 
         /**
@@ -72,21 +94,8 @@ namespace ThreadCollor
         #region Click events
             private void button_add_Click(object sender, EventArgs e)
             {
-                // Create an instance of the open file dialog box.
-                OpenFileDialog openFileDialog = new OpenFileDialog();
-
-                // Set filter options and filter index.
-                openFileDialog.Filter = "png (.png)|*.png|All Files (*.*)|*.*";
-                openFileDialog.FilterIndex = 1;
-                //Allows the user to select multiple files
-                openFileDialog.Multiselect = true;
-
-                // Call the ShowDialog method to show the dialog box wherein the user can select files.
-                openFileDialog.ShowDialog();
-
-                //Put the dialog results into a list
-                //This list will contain file paths
-                List<string> selectedFiles = openFileDialog.FileNames.ToList();
+                //Ask the user which files to add
+                List<string> selectedFiles = askForFiles();
             
                 //Process input if the use clicked OK.
 
