@@ -11,29 +11,36 @@ namespace ThreadCollor
 {
     class ThreadManager
     {
-        Queue<string> taskList;
+        Queue<KeyValuePair<string, int>> taskList;
         ColorCalculator[] workers;
         ListView listView_overview;
 
-        public ThreadManager(int numberOfThreads, ListView listView_overview)
+        public ThreadManager(ListView listView_overview)
         {
             this.listView_overview = listView_overview;
+        }
+
+        public void startThreads(Queue<KeyValuePair<string, int>> taskList, int numberOfThreads)
+        {
+            //Create a local copy of the task list
+            this.taskList = taskList;
+            
+            //Give the workers array a lenght
             workers = new ColorCalculator[numberOfThreads];
 
+            //Fill the workers array with ColorCalculators
             for (int i = 0; i < workers.Length; i++)
             {
-                workers[i] = new ColorCalculator(listView_overview);
+                //
+                workers[i] = new ColorCalculator(listView_overview, taskList);
+                
                 //ColorCalculator worker = workers[i];
                 //worker = new ColorCalculator();
                 //worker.DoWork += work;
                 //worker.ProgressChanged += reportProgress;
             }
-        }
 
-        public void start(Queue<string> taskList)
-        {
-            this.taskList = taskList;
-
+            //Set all the workers to work
             foreach(ColorCalculator worker in workers)
             {
                 worker.RunWorkerAsync();

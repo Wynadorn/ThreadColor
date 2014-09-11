@@ -11,11 +11,13 @@ namespace ThreadCollor
 {
     class ColorCalculator : BackgroundWorker
     {
-        ListView listView_overview;
+        private ListView listView_overview;
         private Dictionary<string, int> result;
+        private Queue<KeyValuePair<string, int>> taskList;
 
-        public ColorCalculator(ListView listView_overview)
+        public ColorCalculator(ListView listView_overview, Queue<KeyValuePair<string, int>> taskList)
         {
+            this.taskList = taskList;
             this.listView_overview = listView_overview;
             result = new Dictionary<string,int>();
 

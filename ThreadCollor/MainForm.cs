@@ -19,11 +19,11 @@ namespace ThreadCollor
         **/
         #region Variable declarations
             //A list containing references to all the tasks that have to be done
-            private static Queue<string> taskList = new Queue<string>();
+            private static Queue<KeyValuePair<string, int>> taskList = new Queue<KeyValuePair<string, int>>();
             //Only column width changed after the form load event should be saved
             private static List<FileEntry> backlog_overview = new List<FileEntry>();
 
-            ThreadManager temp;
+            ThreadManager threadManager;
         
             //A flag which is set after the form loads
             private bool widthChangeFlag = false;
@@ -103,7 +103,8 @@ namespace ThreadCollor
                 foreach(string filepath in selectedFiles)
                 {
                     backlog_overview.Add(new FileEntry(System.IO.Path.GetFileName(filepath), filepath));
-                    taskList.Enqueue(filepath);
+
+                    taskList.Enqueue(new KeyValuePair<string, int>("filepath", 1));
                 }
 
                 updateOverview();
@@ -134,8 +135,8 @@ namespace ThreadCollor
                     comboBox_cores.Enabled = false;
                     numericUpDown_threads.Enabled = false;
 
-                    temp = new ThreadManager((int)numericUpDown_threads.Value, listView_overview);
-                    temp.start(taskList);
+                    threadManager = new ThreadManager(listView_overview);
+                    threadManager.startThreads(taskList, (int)numericUpDown_threads.Value);
                 }
                 else
                 {
@@ -145,7 +146,7 @@ namespace ThreadCollor
                     button_remove.Enabled = true;
                     comboBox_cores.Enabled = true;
                     numericUpDown_threads.Enabled = true;
-                    temp.stop();
+                    threadManager.stop();
                 }
             }
 
