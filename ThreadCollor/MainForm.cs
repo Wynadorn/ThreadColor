@@ -46,6 +46,7 @@ namespace ThreadCollor
                 FileEntry backlog_entry = backlog_overview[i];
 
                 ListViewItem newEntry = new ListViewItem(new String[8]);
+                newEntry.UseItemStyleForSubItems = false;
                 newEntry.SubItems[0].Text = backlog_entry.getFileName();
                 newEntry.SubItems[1].Text = backlog_entry.getFilePath();
                 newEntry.SubItems[2].Text = backlog_entry.getStatus();
@@ -56,8 +57,12 @@ namespace ThreadCollor
                 newEntry.SubItems[6].Text = hexValue;
                 if(hexValue != "-")
                 {
-                    newEntry.SubItems[6].BackColor = ColorTranslator.FromHtml("#" + hexValue);
-                    newEntry.SubItems[6].Text = String.Empty;
+                    newEntry.SubItems[7].BackColor = ColorTranslator.FromHtml("#" + hexValue);
+                    newEntry.SubItems[7].Text = String.Empty;
+                }
+                else
+                {
+                    newEntry.SubItems[7].Text = "-";
                 }
                 listView_overview.Items.Add(newEntry);
                 backlog_entry.setEntryNumber(i);

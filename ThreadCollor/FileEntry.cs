@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace ThreadCollor
 {
@@ -15,7 +17,7 @@ namespace ThreadCollor
         private int red = -1;
         private int green = -1;
         private int blue = -1;
-        private int hex = -1;
+        private string hex = String.Empty;
 
         public FileEntry(string fileName, string filePath)
         {
@@ -82,13 +84,13 @@ namespace ThreadCollor
 
         public string getHex()
         {
-            if (hex == -1)
+            if (hex == String.Empty)
             {
                 return "-";
             }
             else
             {
-                return hex.ToString();
+                return hex;
             }
         }
         #endregion
@@ -149,14 +151,17 @@ namespace ThreadCollor
             if (blue >= 0 && blue <= 255)
             {
                 this.blue = blue;
+                setHex();
             }
         }
 
-        public void setHex(int hex)
+        private void setHex()
         {
-            if(hex >= 0x000000 && hex <= 0xffffff)
+            if (red != -1 && green != -1 && blue != -1)
             {
-                this.hex = hex;
+                Color myColor = Color.FromArgb(red, green, blue);
+
+                this.hex = myColor.R.ToString("X2") + myColor.G.ToString("X2") + myColor.B.ToString("X2");
             }
         }
         #endregion
