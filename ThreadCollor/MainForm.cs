@@ -19,7 +19,7 @@ namespace ThreadCollor
         **/
         #region Variable declarations
             //A list containing references to all the tasks that have to be done
-            private static Queue<string> toDoList = new Queue<string>();
+            private static Queue<string> taskList = new Queue<string>();
             //Only column width changed after the form load event should be saved
             private static List<FileEntry> backlog_overview = new List<FileEntry>();
 
@@ -103,7 +103,7 @@ namespace ThreadCollor
                 foreach(string filepath in selectedFiles)
                 {
                     backlog_overview.Add(new FileEntry(System.IO.Path.GetFileName(filepath), filepath));
-                    toDoList.Enqueue(filepath);
+                    taskList.Enqueue(filepath);
                 }
 
                 updateOverview();
@@ -135,7 +135,7 @@ namespace ThreadCollor
                     numericUpDown_threads.Enabled = false;
 
                     temp = new ThreadManager((int)numericUpDown_threads.Value, listView_overview);
-                    temp.start(toDoList);
+                    temp.start(taskList);
                 }
                 else
                 {
