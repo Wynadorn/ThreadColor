@@ -31,6 +31,9 @@ namespace ThreadCollor
 
         public MainForm()
         {
+            threadManager = new ThreadManager();
+            threadManager.allThreadsDone += new ThreadManager.AllThreadsDone(stop);
+
             //Initialize the form
             InitializeComponent();
         }
@@ -94,6 +97,34 @@ namespace ThreadCollor
             return openFileDialog.FileNames.ToList();
         }
 
+        private void start()
+        {
+            threadManager.setListView(listView_overview);
+            
+            //Lock the controls
+            button_start.Text = "Stop";
+            button_add.Enabled = false;
+            button_remove.Enabled = false;
+            comboBox_cores.Enabled = false;
+            numericUpDown_threads.Enabled = false;
+
+
+            threadManager.startThreads(taskList, (int)numericUpDown_threads.Value);
+        }
+
+        private void stop()
+        {
+            if(button_start.Text == "Stop")
+            {
+                //Unlock the controls
+                button_start.Text = "Start";
+                button_add.Enabled = true;
+                button_remove.Enabled = true;
+                comboBox_cores.Enabled = true;
+                numericUpDown_threads.Enabled = true;
+            }
+        }
+
         /**
          *  All the click events the Windows form uses are within this region.
         **/
@@ -113,6 +144,10 @@ namespace ThreadCollor
                     backlog_overview.Add(fileEntry);
                     taskList.Enqueue(fileEntry);
                 }
+                if(backlog_overview.Count > 0)
+                {
+                    button_start.Enabled = true;
+                }
 
                 updateOverview();
             }
@@ -128,32 +163,22 @@ namespace ThreadCollor
                         i--;
                     }
                 }
+                if(backlog_overview.Count <= 0)
+                {
+                    button_start.Enabled = false;
+                }
             }
 
             //Start or stop calculations
             private void button_start_Click(object sender, EventArgs e)
             {
-                if(button_start.Text == "Start")
+                if (button_start.Text == "Start")
                 {
-                    //Lock the controls
-                    button_start.Text = "Stop";
-                    button_add.Enabled = false;
-                    button_remove.Enabled = false;
-                    comboBox_cores.Enabled = false;
-                    numericUpDown_threads.Enabled = false;
-
-                    threadManager = new ThreadManager(listView_overview);
-                    threadManager.startThreads(taskList, (int)numericUpDown_threads.Value);
+                    start();
                 }
                 else
                 {
-                    //Unlock the controls
-                    button_start.Text = "Start";
-                    button_add.Enabled = true;
-                    button_remove.Enabled = true;
-                    comboBox_cores.Enabled = true;
-                    numericUpDown_threads.Enabled = true;
-                    threadManager.stop();
+                    stop();
                 }
             }
 
@@ -230,7 +255,7 @@ namespace ThreadCollor
             private void listView_overview_ColumnWidthChanged(object sender, ColumnWidthChangedEventArgs e)
             {
                 //If the form has loaded start recording changes in width
-                if (true)
+                if(this.widthChangeFlag)
                 {
                     int[] columnWidths = new int[8];
                     int i = 0;

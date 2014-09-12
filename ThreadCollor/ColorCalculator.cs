@@ -18,6 +18,10 @@ namespace ThreadCollor
         private Queue<FileEntry> taskList;
         FileEntry entry;
 
+        //An event handler to tell the thread manager there is no work left to do
+        public event DoneHandler Done;
+        public delegate void DoneHandler(ColorCalculator c, EventArgs e);
+
         public ColorCalculator(ListView listView_overview, Queue<FileEntry> taskList)
         {
             this.taskList = taskList;
@@ -30,8 +34,8 @@ namespace ThreadCollor
 
         protected override void OnDoWork(DoWorkEventArgs e)
         {
-            //while(taskList.Count != 0)
-            //{
+            if(taskList.Count > 0)
+            {
                 int avgRed = -1,
                     avgGreen = -1,
                     avgBlue = -1;
@@ -54,8 +58,10 @@ namespace ThreadCollor
                     //For every colum of pixels
                     for(int x=0; x<image.Width; x++)
                     {
+                        //Get the pixel
                         Color pixel = image.GetPixel(x, y);
 
+                        //Add the colors to the average
                         avgRed += pixel.R;
                         avgGreen += pixel.G;
                         avgBlue += pixel.B;
@@ -73,7 +79,7 @@ namespace ThreadCollor
                     entry.setGreen((avgGreen+1) / numberOfPixels);
                     entry.setBlue((avgBlue+1) / numberOfPixels);
                 }
-            //}
+            }
         }
 
         protected override void OnProgressChanged(ProgressChangedEventArgs e)
@@ -84,25 +90,35 @@ namespace ThreadCollor
 
         protected override void OnRunWorkerCompleted(RunWorkerCompletedEventArgs e)
         {
-            System.Windows.Forms.ListViewItem.ListViewSubItemCollection subItems = listView_overview.Items[entry.getEntryNumber()].SubItems;
-            subItems[2].Text = "Finished";
-            subItems[3].Text = entry.getRed();
-            subItems[4].Text = entry.getGreen();
-            subItems[5].Text = entry.getBlue();
-            
-            string hexValue = entry.getHex();
-            subItems[6].Text = hexValue;
-            if (hexValue != "-")
+            if(entry != null)
             {
-                subItems[7].BackColor = ColorTranslator.FromHtml("#" + hexValue);
-                subItems[7].Text = String.Empty;
+                System.Windows.Forms.ListViewItem.ListViewSubItemCollection subItems = listView_overview.Items[entry.getEntryNumber()].SubItems;
+                subItems[2].Text = "Finished";
+                subItems[3].Text = entry.getRed();
+                subItems[4].Text = entry.getGreen();
+                subItems[5].Text = entry.getBlue();
+            
+                string hexValue = entry.getHex();
+                subItems[6].Text = hexValue;
+                if (hexValue != "-")
+                {
+                    subItems[7].BackColor = ColorTranslator.FromHtml("#" + hexValue);
+                    subItems[7].Text = String.Empty;
+                }
             }
 
+            //If there is still work left to be done
             if(taskList.Count > 0)
             {
+                //Start again
                 this.RunWorkerAsync();
             }
-            //MessageBox.Show("done");
+            //Else all the work is done
+            else
+            {
+                //Report to the thread manager this thread has nothing left to do
+                Done(this, e);
+            }
         }
     }
 }
