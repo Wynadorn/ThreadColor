@@ -23,6 +23,8 @@ namespace ThreadCollor
             //Only column width changed after the form load event should be saved
             private static List<FileEntry> backlog_overview = new List<FileEntry>();
 
+            private bool threadsRunning = false;
+
             ThreadManager threadManager;
         
             //A flag which is set after the form loads
@@ -32,7 +34,7 @@ namespace ThreadCollor
         public MainForm()
         {
             threadManager = new ThreadManager();
-            threadManager.allThreadsDone += new ThreadManager.AllThreadsDone(stop);
+            threadManager.allThreadsDone += new ThreadManager.AllThreadsDone(threadsDone);
 
             //Initialize the form
             InitializeComponent();
@@ -107,10 +109,14 @@ namespace ThreadCollor
             button_remove.Enabled = false;
             comboBox_cores.Enabled = false;
             numericUpDown_threads.Enabled = false;
-
-            foreach(FileEntry entry in backlog_overview)
+            
+            if(backlog_overview.Count > 0)
             {
-                taskList.Enqueue(entry);
+                threadsRunning = true;
+                foreach(FileEntry entry in backlog_overview)
+                {
+                    taskList.Enqueue(entry);
+                }
             }
 
             threadManager.startThreads(taskList, (int)numericUpDown_threads.Value);
@@ -120,15 +126,31 @@ namespace ThreadCollor
         {
             if(button_start.Text == "Stop")
             {
-                taskList.Clear();
-
-                //Unlock the controls
-                button_start.Text = "Start";
-                button_add.Enabled = true;
-                button_remove.Enabled = true;
-                comboBox_cores.Enabled = true;
-                numericUpDown_threads.Enabled = true;
+                if(threadsRunning)
+                {
+                    taskList.Clear();
+                    button_start.Enabled = false;
+                }
+                else
+                {
+                    //Unlock the controls
+                    button_start.Text = "Start";
+                    button_add.Enabled = true;
+                    button_remove.Enabled = true;
+                    comboBox_cores.Enabled = true;
+                    numericUpDown_threads.Enabled = true;
+                }
             }
+        }
+
+        private void threadsDone()
+        {
+            threadsRunning = false;
+            if(button_start.Enabled == false)
+            {
+                button_start.Enabled = true;
+            }
+            stop();
         }
 
         /**
