@@ -120,6 +120,8 @@ namespace ThreadCollor
         {
             if(button_start.Text == "Stop")
             {
+                taskList.Clear();
+
                 //Unlock the controls
                 button_start.Text = "Start";
                 button_add.Enabled = true;
