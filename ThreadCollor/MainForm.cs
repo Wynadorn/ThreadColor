@@ -86,7 +86,8 @@ namespace ThreadCollor
             OpenFileDialog openFileDialog = new OpenFileDialog();
 
             // Set filter options and filter index.
-            openFileDialog.Filter = "png (.png)|*.png|All Files (*.*)|*.*";
+            //openFileDialog.Filter = "png (.png)|*.png|All Files (*.*)|*.*";
+            openFileDialog.Filter = "Image files (*.jpg, *.jpeg, *.png) | *.jpg; *.jpeg; *.jpe; *.jfif; *.png | All Files (*.*)|*.*";
             openFileDialog.FilterIndex = 1;
             //Allows the user to select multiple files
             openFileDialog.Multiselect = true;
