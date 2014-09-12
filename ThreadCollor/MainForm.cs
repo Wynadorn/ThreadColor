@@ -108,6 +108,10 @@ namespace ThreadCollor
             comboBox_cores.Enabled = false;
             numericUpDown_threads.Enabled = false;
 
+            foreach(FileEntry entry in backlog_overview)
+            {
+                taskList.Enqueue(entry);
+            }
 
             threadManager.startThreads(taskList, (int)numericUpDown_threads.Value);
         }
@@ -142,7 +146,6 @@ namespace ThreadCollor
                     FileEntry fileEntry = new FileEntry(System.IO.Path.GetFileName(filepath), filepath);
 
                     backlog_overview.Add(fileEntry);
-                    taskList.Enqueue(fileEntry);
                 }
                 if(backlog_overview.Count > 0)
                 {
@@ -154,15 +157,15 @@ namespace ThreadCollor
 
             private void button_remove_Click(object sender, EventArgs e)
             {
-                for (int i = 0; i < listView_overview.Items.Count; i++)
+                for (int i = listView_overview.Items.Count-1; i >= 0; i--)
                 {
                     if (listView_overview.Items[i].Selected)
                     {
                         backlog_overview.RemoveAt(i);
-                        updateOverview();//listView_overview.Items[i].Remove();
-                        i--;
+                        //listView_overview.Items[i].Remove();
                     }
                 }
+                updateOverview();
                 if(backlog_overview.Count <= 0)
                 {
                     button_start.Enabled = false;
