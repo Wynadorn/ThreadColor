@@ -115,7 +115,10 @@ namespace ThreadCollor
                 threadsRunning = true;
                 foreach(FileEntry entry in backlog_overview)
                 {
-                    taskList.Enqueue(entry);
+                    if(entry.getStatus() == "Waiting")
+                    {
+                        taskList.Enqueue(entry);
+                    }
                 }
             }
 

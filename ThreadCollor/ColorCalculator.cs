@@ -93,6 +93,7 @@ namespace ThreadCollor
             if(entry != null)
             {
                 System.Windows.Forms.ListViewItem.ListViewSubItemCollection subItems = listView_overview.Items[entry.getEntryNumber()].SubItems;
+                entry.setStatus("Finished");
                 subItems[2].Text = "Finished";
                 subItems[3].Text = entry.getRed();
                 subItems[4].Text = entry.getGreen();
