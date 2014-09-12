@@ -33,11 +33,6 @@ namespace ThreadCollor
             {
                 //
                 workers[i] = new ColorCalculator(listView_overview, taskList);
-                
-                //ColorCalculator worker = workers[i];
-                //worker = new ColorCalculator();
-                //worker.DoWork += work;
-                //worker.ProgressChanged += reportProgress;
             }
 
             //Set all the workers to work
