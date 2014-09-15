@@ -48,6 +48,9 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="FileEntry.cs" />
+    <Compile Include="ListViewNF.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>

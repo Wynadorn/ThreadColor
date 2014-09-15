@@ -43,6 +43,7 @@ namespace ThreadCollor
             //Initialize the form
             InitializeComponent();
             Thread.CurrentThread.Priority = ThreadPriority.AboveNormal;
+            //this.DoubleBuffered = true;
         }
 
         /// <summary>
@@ -92,7 +93,7 @@ namespace ThreadCollor
 
             // Set filter options and filter index.
             //openFileDialog.Filter = "png (.png)|*.png|All Files (*.*)|*.*";
-            openFileDialog.Filter = "Image files (*.jpg, *.jpeg, *.png) | *.jpg; *.jpeg; *.jpe; *.jfif; *.png | All Files (*.*)|*.*";
+            openFileDialog.Filter = "Image files (*.jpg, *.jpeg, *.png) | *.jpg; *.jpeg; *.png | All Files (*.*)|*.*";
             openFileDialog.FilterIndex = 1;
             //Allows the user to select multiple files
             openFileDialog.Multiselect = true;

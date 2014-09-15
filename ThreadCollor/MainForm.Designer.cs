@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.button_add = new System.Windows.Forms.Button();
-            this.listView_overview = new System.Windows.Forms.ListView();
+            this.listView_overview = new ListViewNF();
             this.columnHeader_filename = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader_filepath = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader_status = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
