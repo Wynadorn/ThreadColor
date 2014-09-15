@@ -29,6 +29,9 @@ namespace ThreadCollor
         
             //A flag which is set after the form loads
             private bool widthChangeFlag = false;
+
+            DateTime startingTime;
+            int numberOfImages = 1;
         #endregion
 
         public MainForm()
@@ -100,6 +103,22 @@ namespace ThreadCollor
             return openFileDialog.FileNames.ToList();
         }
 
+        private void startTimer(int numberOfImages)
+        {
+            this.numberOfImages = numberOfImages;
+            startingTime = DateTime.Now;
+        }
+
+        private TimeSpan reportTime()
+        {
+            if(startingTime != DateTime.MinValue)
+            {
+                TimeSpan total = DateTime.Now - startingTime;
+                return total;
+            }
+            return TimeSpan.Zero;
+        }
+
         private void start()
         {
             threadManager.setListView(listView_overview);
@@ -110,7 +129,9 @@ namespace ThreadCollor
             button_remove.Enabled = false;
             comboBox_cores.Enabled = false;
             numericUpDown_threads.Enabled = false;
+
             
+
             if(backlog_overview.Count > 0)
             {
                 threadsRunning = true;
@@ -123,6 +144,7 @@ namespace ThreadCollor
                 }
             }
 
+            startTimer(taskList.Count);
             threadManager.startThreads(taskList, (int)numericUpDown_threads.Value);
         }
 
@@ -143,6 +165,10 @@ namespace ThreadCollor
                     button_remove.Enabled = true;
                     comboBox_cores.Enabled = true;
                     numericUpDown_threads.Enabled = true;
+                    //MessageBox.Show(reportTime().TotalSeconds.ToString());
+
+                    MessageBox.Show(String.Format("Total running time is {0} seconds. \nThat's {1} seconds for each image.", Math.Round(reportTime().TotalSeconds, 2).ToString(), Math.Round(reportTime().TotalSeconds / numberOfImages, 2).ToString()),
+                                    "Run time report");
                 }
             }
         }
