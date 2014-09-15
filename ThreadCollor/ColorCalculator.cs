@@ -67,9 +67,12 @@ namespace ThreadCollor
                         avgBlue += pixel.B;
                     }
 
-                    //Report progress after every row
-                    double progress = (y*image.Width / (double)numberOfPixels) * 100;
-                    ReportProgress((int)progress);
+                    if(y%25 == 0)
+                    {
+                        //Report progress after every row
+                        double progress = (y*image.Width / (double)numberOfPixels) * 100;
+                        ReportProgress((int)progress);
+                    }
                 }
 
                 //Calculate the avg values
