@@ -44,43 +44,50 @@ namespace ThreadCollor
                 entry = taskList.Dequeue();
 
                 //Load the image into memory
-                Bitmap image = new Bitmap(entry.getFilePath());
-
-                //Calculate the number of pixels in the image
-                int numberOfPixels = image.Height*image.Width;
-
-                //Set the progress to 0
-                ReportProgress(0);
-
-                //For every row of pixels
-                for(int y=0; y<image.Height; y++)
+                try
                 {
-                    //For every colum of pixels
-                    for(int x=0; x<image.Width; x++)
-                    {
-                        //Get the pixel
-                        Color pixel = image.GetPixel(x, y);
+                    Bitmap image = new Bitmap(entry.getFilePath());
 
-                        //Add the colors to the average
-                        avgRed += pixel.R;
-                        avgGreen += pixel.G;
-                        avgBlue += pixel.B;
+                    //Calculate the number of pixels in the image
+                    int numberOfPixels = image.Height * image.Width;
+
+                    //Set the progress to 0
+                    ReportProgress(0);
+
+                    //For every row of pixels
+                    for (int y = 0; y < image.Height; y++)
+                    {
+                        //For every colum of pixels
+                        for (int x = 0; x < image.Width; x++)
+                        {
+                            //Get the pixel
+                            Color pixel = image.GetPixel(x, y);
+
+                            //Add the colors to the average
+                            avgRed += pixel.R;
+                            avgGreen += pixel.G;
+                            avgBlue += pixel.B;
+                        }
+
+                        if (y % 50 == 0)
+                        {
+                            //Report progress after every row
+                            double progress = (y * image.Width / (double)numberOfPixels) * 100;
+                            ReportProgress((int)progress);
+                        }
                     }
 
-                    if(y%50 == 0)
+                    //Calculate the avg values
+                    if (avgRed != -1 && avgGreen != -1 && avgBlue != -1)
                     {
-                        //Report progress after every row
-                        double progress = (y*image.Width / (double)numberOfPixels) * 100;
-                        ReportProgress((int)progress);
+                        entry.setRed((avgRed + 1) / numberOfPixels);
+                        entry.setGreen((avgGreen + 1) / numberOfPixels);
+                        entry.setBlue((avgBlue + 1) / numberOfPixels);
                     }
                 }
-
-                //Calculate the avg values
-                if (avgRed != -1 && avgGreen != -1 && avgBlue != -1)
+                catch(System.ArgumentException)
                 {
-                    entry.setRed((avgRed+1) / numberOfPixels);
-                    entry.setGreen((avgGreen+1) / numberOfPixels);
-                    entry.setBlue((avgBlue+1) / numberOfPixels);
+                    //not an image
                 }
             }
         }
