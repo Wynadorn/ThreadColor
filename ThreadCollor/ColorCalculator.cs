@@ -67,7 +67,7 @@ namespace ThreadCollor
                         avgBlue += pixel.B;
                     }
 
-                    if(y%25 == 0)
+                    if(y%50 == 0)
                     {
                         //Report progress after every row
                         double progress = (y*image.Width / (double)numberOfPixels) * 100;
@@ -87,7 +87,7 @@ namespace ThreadCollor
 
         protected override void OnProgressChanged(ProgressChangedEventArgs e)
         {
-            Console.WriteLine("{0}%", e.ProgressPercentage);
+            //Console.WriteLine("{0}%", e.ProgressPercentage);
             listView_overview.Items[entry.getEntryNumber()].SubItems[2].Text = e.ProgressPercentage.ToString()+"%";
         }
 

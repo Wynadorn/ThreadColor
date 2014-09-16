@@ -28,8 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.button_add = new System.Windows.Forms.Button();
-            this.listView_overview = new ListViewNF();
+            this.listView_overview = new ThreadCollor.ListViewNF();
             this.columnHeader_filename = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader_filepath = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader_status = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -276,6 +277,7 @@
             this.Controls.Add(this.button_remove);
             this.Controls.Add(this.listView_overview);
             this.Controls.Add(this.button_add);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(762, 150);
             this.Name = "MainForm";
             this.Text = "Image colors";
@@ -309,7 +311,7 @@
         private System.Windows.Forms.ColumnHeader columnHeader_color;
         private System.Windows.Forms.TextBox textBox_filter;
         private System.Windows.Forms.Label label_filter;
-        public System.Windows.Forms.ListView listView_overview;
+        private ListViewNF listView_overview;
     }
 }
 
