@@ -15,16 +15,18 @@ namespace ThreadCollor
     {
         private ListView listView_overview;
         private Dictionary<string, int> result;
-        private Queue<FileEntry> taskList;
+        private FileManager fileManager;
+        
         FileEntry entry;
+        Point range;
 
         //An event handler to tell the thread manager there is no work left to do
         public event DoneHandler Done;
         public delegate void DoneHandler(ColorCalculator c, EventArgs e);
 
-        public ColorCalculator(ListView listView_overview, Queue<FileEntry> taskList)
+        public ColorCalculator(ListView listView_overview, FileManager fileManager)
         {
-            this.taskList = taskList;
+            this.fileManager = fileManager;
             this.listView_overview = listView_overview;
             result = new Dictionary<string,int>();
 
@@ -34,14 +36,17 @@ namespace ThreadCollor
 
         protected override void OnDoWork(DoWorkEventArgs e)
         {
-            if(taskList.Count > 0)
+            if(fileManager.FilesWaiting> 0)
             {
+                KeyValuePair<FileEntry, Point> kvp = fileManager.getTask();
+                entry = kvp.Key;
+                range = kvp.Value;
+
                 int avgRed = -1,
                     avgGreen = -1,
                     avgBlue = -1;
             
                 //Grab task from queue
-                entry = taskList.Dequeue();
 
                 //Load the image into memory
                 try
@@ -94,8 +99,10 @@ namespace ThreadCollor
 
         protected override void OnProgressChanged(ProgressChangedEventArgs e)
         {
-            //Console.WriteLine("{0}%", e.ProgressPercentage);
-            listView_overview.Items[entry.getEntryNumber()].SubItems[2].Text = e.ProgressPercentage.ToString()+"%";
+            if(entry != null)
+            {
+                listView_overview.Items[entry.getEntryNumber()].SubItems[2].Text = e.ProgressPercentage.ToString() + "%";
+            }
         }
 
         protected override void OnRunWorkerCompleted(RunWorkerCompletedEventArgs e)
@@ -119,7 +126,7 @@ namespace ThreadCollor
             }
 
             //If there is still work left to be done
-            if(taskList.Count > 0)
+            if(fileManager.FilesWaiting> 0)
             {
                 //Start again
                 this.RunWorkerAsync();

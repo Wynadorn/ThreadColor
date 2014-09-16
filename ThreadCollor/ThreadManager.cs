@@ -11,7 +11,7 @@ namespace ThreadCollor
 {
     class ThreadManager
     {
-        Queue<FileEntry> _taskList;
+        FileManager fileManager;
         ColorCalculator[] workers;
         ListView listView_overview;
         int tasksRunning = 0;
@@ -20,18 +20,18 @@ namespace ThreadCollor
         public event AllThreadsDone allThreadsDone;
         public delegate void AllThreadsDone();
 
-        public Queue<FileEntry> taskList
-        {
-            get { return _taskList; }
-            set
-            {
-                _taskList = value;
-                if(_taskList.Count <= 0)
-                {
-                    MessageBox.Show("all done");
-                }
-            }
-        }
+        //public Queue<FileEntry> taskList
+        //{
+        //    get { return _taskList; }
+        //    set
+        //    {
+        //        _taskList = value;
+        //        if(_taskList.Count <= 0)
+        //        {
+        //            MessageBox.Show("all done");
+        //        }
+        //    }
+        //}
         
         //public ThreadManager()
         //{}
@@ -41,10 +41,10 @@ namespace ThreadCollor
             this.listView_overview = listView_overview;
         }
 
-        public void startThreads(Queue<FileEntry> taskList, int numberOfThreads)
+        public void startThreads(FileManager fileManager, int numberOfThreads)
         {
             //Create a local copy of the task list
-            this._taskList = taskList;
+            this.fileManager = fileManager;
             
             //Give the workers array a lenght
             workers = new ColorCalculator[numberOfThreads];
@@ -53,7 +53,7 @@ namespace ThreadCollor
             for (int i = 0; i < workers.Length; i++)
             {
                 //
-                workers[i] = new ColorCalculator(listView_overview, this.taskList);
+                workers[i] = new ColorCalculator(listView_overview, this.fileManager);
                 workers[i].Done += new ColorCalculator.DoneHandler(threadFinished);
             }
 

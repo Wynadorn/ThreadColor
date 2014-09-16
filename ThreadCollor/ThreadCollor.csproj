@@ -51,6 +51,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="FileEntry.cs" />
+    <Compile Include="FileManager.cs" />
     <Compile Include="ListViewNF.cs">
       <SubType>Component</SubType>
     </Compile>

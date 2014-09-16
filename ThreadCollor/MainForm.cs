@@ -20,9 +20,9 @@ namespace ThreadCollor
         **/
         #region Variable declarations
             //A list containing references to all the tasks that have to be done
-            private static Queue<FileEntry> taskList = new Queue<FileEntry>();
+            //private static Queue<FileEntry> taskList = new Queue<FileEntry>();
             //Only column width changed after the form load event should be saved
-            private static List<FileEntry> backlog_overview = new List<FileEntry>();
+            //private static List<FileEntry> backlog_overview = new List<FileEntry>();
 
             private bool threadsRunning = false;
 
@@ -33,10 +33,13 @@ namespace ThreadCollor
 
             DateTime startingTime;
             int numberOfImages = 1;
+
+            FileManager fileManager;
         #endregion
 
         public MainForm()
         {
+            fileManager = new FileManager();
             threadManager = new ThreadManager();
             threadManager.allThreadsDone += new ThreadManager.AllThreadsDone(threadsDone);
 
@@ -52,9 +55,9 @@ namespace ThreadCollor
         private void updateOverview()
         {
             listView_overview.Items.Clear();
-            for(int i = 0; i < backlog_overview.Count; i++)
+            for(int i = 0; i < fileManager.Count; i++)
             {
-                FileEntry backlog_entry = backlog_overview[i];
+                FileEntry backlog_entry = fileManager[i];
 
                 ListViewItem newEntry = new ListViewItem(new String[8]);
                 newEntry.UseItemStyleForSubItems = false;
@@ -124,31 +127,32 @@ namespace ThreadCollor
 
         private void start()
         {
-            threadManager.setListView(listView_overview);
-            
-            //Lock the controls
-            button_start.Text = "Stop";
-            button_add.Enabled = false;
-            button_remove.Enabled = false;
-            comboBox_cores.Enabled = false;
-            numericUpDown_threads.Enabled = false;
-
-            
-
-            if(backlog_overview.Count > 0)
+            if (fileManager.FilesWaiting > 0)
             {
-                threadsRunning = true;
-                foreach(FileEntry entry in backlog_overview)
-                {
-                    if(entry.getStatus() == "Waiting")
-                    {
-                        taskList.Enqueue(entry);
-                    }
-                }
-            }
+                threadManager.setListView(listView_overview);
+            
+                //Lock the controls
+                button_start.Text = "Stop";
+                button_add.Enabled = false;
+                button_remove.Enabled = false;
+                comboBox_cores.Enabled = false;
+                numericUpDown_threads.Enabled = false;
 
-            startTimer(taskList.Count);
-            threadManager.startThreads(taskList, (int)numericUpDown_threads.Value);
+            
+
+            
+                threadsRunning = true;
+                threadManager.startThreads(fileManager, (int)numericUpDown_threads.Value);
+                startTimer(1);
+                //fileManager.generateQueue();
+                //foreach(FileEntry entry in fileManager.getFiles())
+                //{
+                //    if(entry.getStatus() == "Waiting")
+                //    {
+                //        taskList.Enqueue(entry);
+                //    }
+                //}
+            }
         }
 
         private void stop()
@@ -157,8 +161,8 @@ namespace ThreadCollor
             {
                 if(threadsRunning)
                 {
-                    taskList.Clear();
-                    button_start.Enabled = false;
+                    //taskList.Clear();
+                    //button_start.Enabled = false;
                 }
                 else
                 {
@@ -200,11 +204,11 @@ namespace ThreadCollor
                 //Add the files to the backlog
                 foreach(string filepath in selectedFiles)
                 {
-                    FileEntry fileEntry = new FileEntry(System.IO.Path.GetFileName(filepath), filepath);
+                    //FileEntry fileEntry = new FileEntry(System.IO.Path.GetFileName(filepath), filepath);
 
-                    backlog_overview.Add(fileEntry);
+                    fileManager.add(System.IO.Path.GetFileName(filepath), filepath);
                 }
-                if(backlog_overview.Count > 0)
+                if (fileManager.Count > 0)
                 {
                     button_start.Enabled = true;
                 }
@@ -218,12 +222,12 @@ namespace ThreadCollor
                 {
                     if (listView_overview.Items[i].Selected)
                     {
-                        backlog_overview.RemoveAt(i);
+                        fileManager.removeAt(i);
                         //listView_overview.Items[i].Remove();
                     }
                 }
                 updateOverview();
-                if(backlog_overview.Count <= 0)
+                if(fileManager.Count <= 0)
                 {
                     button_start.Enabled = false;
                 }
