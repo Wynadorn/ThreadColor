@@ -109,9 +109,9 @@ namespace ThreadCollor
             return openFileDialog.FileNames.ToList();
         }
 
-        private void startTimer(int numberOfImages)
+        private void startTimer()
         {
-            this.numberOfImages = numberOfImages;
+            this.numberOfImages = fileManager.FilesWaiting;
             startingTime = DateTime.Now;
         }
 
@@ -140,7 +140,7 @@ namespace ThreadCollor
             
                 threadsRunning = true;
                 threadManager.startThreads(fileManager, (int)numericUpDown_threads.Value);
-                startTimer(1);
+                startTimer();
                 //fileManager.generateQueue();
                 //foreach(FileEntry entry in fileManager.getFiles())
                 //{
@@ -173,7 +173,7 @@ namespace ThreadCollor
 
                     fileManager.releaseStopFlag();
 
-                    MessageBox.Show(String.Format("Total running time is {0} seconds. \nThat's {1} seconds for each image.", Math.Round(reportTime().TotalSeconds, 2).ToString(), Math.Round(reportTime().TotalSeconds / numberOfImages, 2).ToString()),
+                    MessageBox.Show(String.Format("Total running time is {0} seconds. \nThat's {1} seconds for each image.", Math.Round(reportTime().TotalSeconds, 2).ToString(), Math.Round(reportTime().TotalSeconds / numberOfImages - fileManager.FilesWaiting, 2).ToString()),
                                     "Run time report");
                 }
             }
