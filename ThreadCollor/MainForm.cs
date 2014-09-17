@@ -9,8 +9,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-//Regex.Match(inputColor, "^#(?:[0-9a-fA-F]{3}){1,2}$").Success
-
 namespace ThreadCollor
 {
     public partial class MainForm : Form
@@ -19,184 +17,249 @@ namespace ThreadCollor
          *  The Variable declarations within this region. 
         **/
         #region Variable declarations
-            //A list containing references to all the tasks that have to be done
-            //private static Queue<FileEntry> taskList = new Queue<FileEntry>();
-            //Only column width changed after the form load event should be saved
-            //private static List<FileEntry> backlog_overview = new List<FileEntry>();
-
+            //A flag which keeps track if there are any threads running
             private bool threadsRunning = false;
 
+            //The thread manager which has control over all the workers
             ThreadManager threadManager;
+            //The file manager which has control over all the (image) files
+            FileManager fileManager;
         
-            //A flag which is set after the form loads
+            //A flag which keeps track remembers if listview column width changes should be saved
             private bool widthChangeFlag = false;
 
+            //The current time when the threads are activated
             DateTime startingTime;
-            int numberOfImages = 1;
-
-            FileManager fileManager;
+            //The number of images that have to be calculated before the threads start working
+            //This value is compared to the number of images waiting after the threads have been stopped to calculate the time per image
+            int imagesWaitingBefore = -1;
         #endregion
 
+        /// <summary>
+        /// The constructor from the mainform class
+        /// </summary>
         public MainForm()
         {
+            //Initialize the FileManager
             fileManager = new FileManager();
+            //Initialize the ThreadManager
             threadManager = new ThreadManager();
+            //Add a AllThreadsDone listener to the ThreadManager
             threadManager.allThreadsDone += new ThreadManager.AllThreadsDone(threadsDone);
 
             //Initialize the form
             InitializeComponent();
+
+            //Prioritize the WinForm thread above the worker threads
             Thread.CurrentThread.Priority = ThreadPriority.AboveNormal;
-            //this.DoubleBuffered = true;
         }
 
         /// <summary>
-        /// This method updates the listView_overview with data contained in the backlog
+        /// This method updates the listView_overview with data contained in the FileManager
         /// </summary>
         private void updateOverview()
         {
+            //Signal the listView that the update is launched
+            listView_overview.BeginUpdate();
+            //Clear the old data
             listView_overview.Items.Clear();
+            
+            //For every file in the FileManager
             for(int i = 0; i < fileManager.Count; i++)
             {
-                FileEntry backlog_entry = fileManager[i];
+                //Grab the current entry
+                FileEntry entry = fileManager[i];
 
+                //Create a new ListViewItem (a row)
                 ListViewItem newEntry = new ListViewItem(new String[8]);
+                //Allow individual cells to apply their own style, This is used for the Color cell
                 newEntry.UseItemStyleForSubItems = false;
-                newEntry.SubItems[0].Text = backlog_entry.getFileName();
-                newEntry.SubItems[1].Text = backlog_entry.getFilePath();
-                newEntry.SubItems[2].Text = backlog_entry.getStatus();
-                newEntry.SubItems[3].Text = backlog_entry.getRed();
-                newEntry.SubItems[4].Text = backlog_entry.getGreen();
-                newEntry.SubItems[5].Text = backlog_entry.getBlue();
-                string hexValue = backlog_entry.getHex();
+
+                //Fill all known information into the cells
+                newEntry.SubItems[0].Text = entry.getFileName();
+                newEntry.SubItems[1].Text = entry.getFilePath();
+                newEntry.SubItems[2].Text = entry.getStatus();
+                newEntry.SubItems[3].Text = entry.getRed();
+                newEntry.SubItems[4].Text = entry.getGreen();
+                newEntry.SubItems[5].Text = entry.getBlue();
+                //Grab the hex value from the entry
+                string hexValue = entry.getHex();
                 newEntry.SubItems[6].Text = hexValue;
+                //If the hexvalue is not "-" (representing null)
                 if(hexValue != "-")
                 {
+                    //Color in the color cell
                     newEntry.SubItems[7].BackColor = ColorTranslator.FromHtml("#" + hexValue);
+                    //Remove the placeholder text ("-")
                     newEntry.SubItems[7].Text = String.Empty;
                 }
+                //If the hex value is unknown
                 else
                 {
+                    //Fill the cell with placeholder text
                     newEntry.SubItems[7].Text = "-";
                 }
+
+                //Add the entry to the ListView
                 listView_overview.Items.Add(newEntry);
-                backlog_entry.setEntryNumber(i);
+                //Pass the position in the ListView to the individual entry
+                entry.setEntryNumber(i);
             }
+
+            //If there are items in the listview
             if(listView_overview.Items.Count > 0)
             {
-                listView_overview.Update();
-                listView_overview.Refresh();
+                //Signal that all the new data has been added
+                listView_overview.EndUpdate();
+                //Scrolldown to the bottom of the list
                 listView_overview.EnsureVisible(listView_overview.Items.Count - 1);
             }
         }
 
+        /// <summary>
+        /// Opens a FileDialog in which the user can select their image files
+        /// </summary>
+        /// <returns>A list of selected files</returns>
         private List<String> askForFiles()
         {
-            // Create an instance of the open file dialog box.
+            //Create an instance of OpenFileDialog
             OpenFileDialog openFileDialog = new OpenFileDialog();
 
-            // Set filter options and filter index.
-            //openFileDialog.Filter = "png (.png)|*.png|All Files (*.*)|*.*";
+            //Filter to these file extensions
             openFileDialog.Filter = "Image files (*.jpg, *.jpeg, *.png) | *.jpg; *.jpeg; *.png | All Files (*.*)|*.*";
+            //Select Image Files on default
             openFileDialog.FilterIndex = 1;
+
             //Allows the user to select multiple files
             openFileDialog.Multiselect = true;
 
-            // Call the ShowDialog method to show the dialog box wherein the user can select files.
+            //Show the OpenFileDialog so the user can select files
             openFileDialog.ShowDialog();
 
             //Put the dialog results into a list
-            //This list will contain file paths
+            //This list will contain the selected file paths
             return openFileDialog.FileNames.ToList();
         }
 
-        private void startTimer()
+        /// <summary>
+        /// This method saved the time at which the threads start running
+        /// </summary>
+        private void setTime()
         {
-            this.numberOfImages = fileManager.FilesWaiting;
+            //Set the time at which the threads start running
             startingTime = DateTime.Now;
+            //Set the number of images waiting at the moment the threads start
+            this.imagesWaitingBefore = fileManager.FilesWaiting;
         }
 
+        /// <summary>
+        /// This method returns the total runtime since setTime has been called
+        /// If setTime hasn't been called it will return zero
+        /// </summary>
+        /// <returns>The total run time of all the threads</returns>
         private TimeSpan reportTime()
         {
+            //If the starting time has been set
             if(startingTime != DateTime.MinValue)
             {
+                //Calculate the total run time
                 TimeSpan total = DateTime.Now - startingTime;
+                //Return it
                 return total;
             }
+            //If not return zero
             return TimeSpan.Zero;
         }
 
+        /// <summary>
+        /// Start the calculations
+        /// </summary>
         private void start()
         {
+            //If there are files waiting to be calculated
             if(fileManager.FilesWaiting > 0)
             {
+                //Pass the listview to the ThreadManager
                 threadManager.setListView(listView_overview);
             
-                //Lock the controls
+                //Lock the controls 
                 button_start.Text = "Stop";
                 button_add.Enabled = false;
                 button_remove.Enabled = false;
                 comboBox_cores.Enabled = false;
                 numericUpDown_threads.Enabled = false;
             
+                //Set the threads running flag to true
                 threadsRunning = true;
+
+                //Tell the ThreadManager to start the threads
                 threadManager.startThreads(fileManager, (int)numericUpDown_threads.Value);
-                startTimer();
-                //fileManager.generateQueue();
-                //foreach(FileEntry entry in fileManager.getFiles())
-                //{
-                //    if(entry.getStatus() == "Waiting")
-                //    {
-                //        taskList.Enqueue(entry);
-                //    }
-                //}
+                
+                //Set the time at whicht the threads started running
+                setTime();
             }
         }
 
+        /// <summary>
+        /// Stop the calculations and report run time
+        /// </summary>
         private void stop()
         {
-            if(button_start.Text == "Stop")
+            //If there are still threads running
+            if(threadsRunning)
             {
-                if(threadsRunning)
-                {
-                    fileManager.setStopFlag();
-                    button_start.Enabled = false;
-                }
-                else
-                {
-                    //Unlock the controls
-                    button_start.Text = "Start";
-                    button_start.Enabled = true;
-                    button_add.Enabled = true;
-                    button_remove.Enabled = true;
-                    comboBox_cores.Enabled = true;
-                    numericUpDown_threads.Enabled = true;
+                //Tell the file manager to stop handing out tasks
+                fileManager.setStopFlag();
+                //Disable the start/stop button
+                button_start.Enabled = false;
+            }
+            //Else if there are no threads running
+            else
+            {
+                //Unlock the controls
+                button_start.Text = "Start";
+                button_start.Enabled = true;
+                button_add.Enabled = true;
+                button_remove.Enabled = true;
+                comboBox_cores.Enabled = true;
+                numericUpDown_threads.Enabled = true;
 
-                    fileManager.releaseStopFlag();
+                //Allow the FileManager to hand out tasks
+                fileManager.releaseStopFlag();
 
-                    MessageBox.Show(String.Format("Total running time is {0} seconds. \nThat's {1} seconds for each image.", Math.Round(reportTime().TotalSeconds, 2).ToString(), Math.Round(reportTime().TotalSeconds / numberOfImages - fileManager.FilesWaiting, 2).ToString()),
-                                    "Run time report");
-                }
+                //Calculate the time needed as strings
+                string totalTime = Math.Round(reportTime().TotalSeconds, 2).ToString();
+                string timePerImage = Math.Round(reportTime().TotalSeconds / (imagesWaitingBefore - fileManager.FilesWaiting), 2).ToString();
+                //Display a MessageBox which shows the total run time and the time per image
+                MessageBox.Show(String.Format("Total running time is {0} seconds. \nThat's {1} seconds for each image.", totalTime, timePerImage),"Run time report");
             }
         }
 
+        /// <summary>
+        /// A method that is triggerd when all the threads have completed their work
+        /// This method is triggered by an event in ThreadManager
+        /// </summary>
         private void threadsDone()
         {
+            //Set the threadsRunning flag to false
             threadsRunning = false;
-            this.stop();
+            //Call the stop method
+            stop();
         }
 
         /**
          *  All the click events the Windows form uses are within this region.
         **/
         #region Click events
+            /// <summary>
+            /// This method is bound to a click event on the add button
+            /// </summary
             private void button_add_Click(object sender, EventArgs e)
             {
                 //Ask the user which files to add
                 List<string> selectedFiles = askForFiles();
-            
-                //Process input if the use clicked OK.
 
-                //Add the files to the backlog
+                //Send the files to the FileManager
                 foreach(string filepath in selectedFiles)
                 {
                     //FileEntry fileEntry = new FileEntry(System.IO.Path.GetFileName(filepath), filepath);
@@ -208,27 +271,40 @@ namespace ThreadCollor
                     button_start.Enabled = true;
                 }
 
+                //Update the overview with the new items
                 updateOverview();
             }
 
+            /// <summary>
+            /// When the remove button has been clicked the highlighted files will be removed
+            /// </summary>
             private void button_remove_Click(object sender, EventArgs e)
             {
+                //For every item in the ListView
                 for (int i = listView_overview.Items.Count-1; i >= 0; i--)
                 {
+                    //If the item has been selected
                     if (listView_overview.Items[i].Selected)
                     {
+                        //Remove the item at location i in the FileManager
                         fileManager.removeAt(i);
-                        //listView_overview.Items[i].Remove();
                     }
                 }
+
+                //Update the ListView to remove the items
                 updateOverview();
+
+                //If every item has been deleted
                 if(fileManager.Count <= 0)
                 {
+                    //Disable the start button
                     button_start.Enabled = false;
                 }
             }
 
-            //Start or stop calculations
+            /// <summary>
+            /// Turn the start button in to a start/stop toggle
+            /// </summary>
             private void button_start_Click(object sender, EventArgs e)
             {
                 if (button_start.Text == "Start")
@@ -240,28 +316,28 @@ namespace ThreadCollor
                     stop();
                 }
             }
-
-            //Import the current overview
+            
+            /// <summary>
+            /// Import previously calculated results, not yet implemented
+            /// </summary>
             private void button_import_Click(object sender, EventArgs e)
-            {
+            {}
 
-            }
-
-            //Export the current overview
+            /// <summary>
+            /// Export calculated results, not yet implemented
+            /// </summary>
             private void button_export_Click(object sender, EventArgs e)
-            {
-
-            }
-
-            //When the filter criteria is changed it will be applied imidiatly
+            {}
+            
+            /// <summary>
+            /// Allow the user to filer the results, not yet implemented
+            /// </summary>
             private void textBox_filter_TextChanged(object sender, EventArgs e)
-            {
-
-            }
+            {}
         #endregion
 
         /**
-         *  These methods preserve the user settings. For example collum with and form size.
+         *  These methods preserve the user settings. For example collum width and form size.
         **/
         #region Preserving user settings
             /// <summary>
@@ -290,7 +366,7 @@ namespace ThreadCollor
                     }
                 }
                 
-                //Resotre the number of cores
+                //Restore the number of cores
                 comboBox_cores.Text = Properties.Settings.Default.Cores.ToString();
                 //Restore the number of threads
                 numericUpDown_threads.Value = Properties.Settings.Default.Threads;
