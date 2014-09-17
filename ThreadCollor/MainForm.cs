@@ -127,7 +127,7 @@ namespace ThreadCollor
 
         private void start()
         {
-            if (fileManager.FilesWaiting > 0)
+            if(fileManager.FilesWaiting > 0)
             {
                 threadManager.setListView(listView_overview);
             
@@ -137,9 +137,6 @@ namespace ThreadCollor
                 button_remove.Enabled = false;
                 comboBox_cores.Enabled = false;
                 numericUpDown_threads.Enabled = false;
-
-            
-
             
                 threadsRunning = true;
                 threadManager.startThreads(fileManager, (int)numericUpDown_threads.Value);
@@ -161,18 +158,20 @@ namespace ThreadCollor
             {
                 if(threadsRunning)
                 {
-                    //taskList.Clear();
-                    //button_start.Enabled = false;
+                    fileManager.setStopFlag();
+                    button_start.Enabled = false;
                 }
                 else
                 {
                     //Unlock the controls
                     button_start.Text = "Start";
+                    button_start.Enabled = true;
                     button_add.Enabled = true;
                     button_remove.Enabled = true;
                     comboBox_cores.Enabled = true;
                     numericUpDown_threads.Enabled = true;
-                    //MessageBox.Show(reportTime().TotalSeconds.ToString());
+
+                    fileManager.releaseStopFlag();
 
                     MessageBox.Show(String.Format("Total running time is {0} seconds. \nThat's {1} seconds for each image.", Math.Round(reportTime().TotalSeconds, 2).ToString(), Math.Round(reportTime().TotalSeconds / numberOfImages, 2).ToString()),
                                     "Run time report");
@@ -183,11 +182,7 @@ namespace ThreadCollor
         private void threadsDone()
         {
             threadsRunning = false;
-            if(button_start.Enabled == false)
-            {
-                button_start.Enabled = true;
-            }
-            stop();
+            this.stop();
         }
 
         /**

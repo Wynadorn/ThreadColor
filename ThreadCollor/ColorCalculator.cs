@@ -36,9 +36,10 @@ namespace ThreadCollor
 
         protected override void OnDoWork(DoWorkEventArgs e)
         {
-            if(fileManager.FilesWaiting> 0)
+            KeyValuePair<FileEntry, Point> kvp = fileManager.getTask();
+            
+            if(kvp.Key != null && kvp.Value != Point.Empty)
             {
-                KeyValuePair<FileEntry, Point> kvp = fileManager.getTask();
                 entry = kvp.Key;
                 range = kvp.Value;
 
@@ -74,7 +75,7 @@ namespace ThreadCollor
                             avgBlue += pixel.B;
                         }
 
-                        if (y % 50 == 0)
+                        if (y % 25 == 0)
                         {
                             //Report progress after every row
                             double progress = (y * image.Width / (double)numberOfPixels) * 100;
@@ -90,10 +91,8 @@ namespace ThreadCollor
                         entry.setBlue((avgBlue + 1) / numberOfPixels);
                     }
                 }
-                catch(System.ArgumentException)
-                {
-                    //not an image
-                }
+                catch(System.ArgumentException) //not an image, do nothing
+                {}
             }
         }
 
@@ -125,7 +124,7 @@ namespace ThreadCollor
                 }
             }
 
-            //If there is still work left to be done
+            ////If there is still work left to be done
             if(fileManager.FilesWaiting> 0)
             {
                 //Start again

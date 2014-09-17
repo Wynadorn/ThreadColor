@@ -20,22 +20,6 @@ namespace ThreadCollor
         public event AllThreadsDone allThreadsDone;
         public delegate void AllThreadsDone();
 
-        //public Queue<FileEntry> taskList
-        //{
-        //    get { return _taskList; }
-        //    set
-        //    {
-        //        _taskList = value;
-        //        if(_taskList.Count <= 0)
-        //        {
-        //            MessageBox.Show("all done");
-        //        }
-        //    }
-        //}
-        
-        //public ThreadManager()
-        //{}
-
         public void setListView(ListView listView_overview)
         {
             this.listView_overview = listView_overview;
