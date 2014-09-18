@@ -112,11 +112,12 @@ namespace ThreadCollor
             //If there are items in the listview
             if(listView_overview.Items.Count > 0)
             {
-                //Signal that all the new data has been added
-                listView_overview.EndUpdate();
                 //Scrolldown to the bottom of the list
                 listView_overview.EnsureVisible(listView_overview.Items.Count - 1);
             }
+
+            //Signal that all the new data has been added
+            listView_overview.EndUpdate();
         }
 
         /// <summary>
