@@ -263,14 +263,12 @@ namespace ThreadCollor
                 List<string> selectedFiles = askForFiles();
 
                 //Send the files to the FileManager
-                foreach(string filepath in selectedFiles)
-                {
-                    //FileEntry fileEntry = new FileEntry(System.IO.Path.GetFileName(filepath), filepath);
+                fileManager.add(selectedFiles);
 
-                    fileManager.add(System.IO.Path.GetFileName(filepath), filepath);
-                }
+                //If there are files in the FileManager
                 if (fileManager.Count > 0)
                 {
+                    //Enable the start button
                     button_start.Enabled = true;
                 }
 

@@ -67,7 +67,7 @@ namespace ThreadCollor
         /// </summary>
         /// <param name="fileName">The name of the file being added</param>
         /// <param name="filePath">The path of the file being added</param>
-        public void add(string fileName, string filePath)
+        private void add(string fileName, string filePath)
         {
             //Local reference to the entry
             FileEntry entry = new FileEntry(fileName, filePath);
@@ -75,6 +75,25 @@ namespace ThreadCollor
             files.Add(entry);
             //Add the entry to the queue, because new tasks are never compled
             tasklist.Enqueue(entry);
+        }
+
+        /// <summary>
+        /// Add a list of filepaths to the FileManager
+        /// </summary>
+        /// <param name="selectedFiles">A list of FilePaths + FileNames</param>
+        public void add(List<string> selectedFiles)
+        {
+            foreach(string filepath in selectedFiles)
+            {
+                //Try to get the FileName
+                try
+                {
+                    //Add the file to the FileManager
+                    this.add(System.IO.Path.GetFileName(filepath), filepath);
+                }
+                catch(ArgumentException)
+                {} //Not a valid path don't add
+            }
         }
 
         /// <summary>
