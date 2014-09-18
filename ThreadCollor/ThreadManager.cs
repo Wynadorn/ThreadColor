@@ -15,9 +15,16 @@ namespace ThreadCollor
     class ThreadManager
     {
         //Create an array of ColorCalculators (workers)
-        ColorCalculator[] workers;
+        private ColorCalculator[] workers;
         //A variable that keeps track of the number of workers running
-        int tasksRunning = 0;
+        private int tasksRunning = 0;
+        //A flag to provide information if threads are running
+        private bool threadsRunning = false;
+        //A public reference to threads running
+        public bool ThreadsRunning
+        {
+            get { return threadsRunning; } 
+        }
 
         //An event handler to tell the MainForm all the threads have finished working
         public event AllThreadsDone allThreadsDone;
@@ -27,6 +34,9 @@ namespace ThreadCollor
         {
             //Give the workers array a lenght
             workers = new ColorCalculator[numberOfThreads];
+
+            //Set threads running to true
+            threadsRunning = true;
 
             //For every worker in workers
             for (int i = 0; i < workers.Length; i++)
@@ -52,6 +62,9 @@ namespace ThreadCollor
             //If there are no tasks working they're all done
             if(tasksRunning <= 0)
             {
+                //Set threadsRunning to false
+                threadsRunning = false;
+
                 //Signal the event
                 allThreadsDone();
             }

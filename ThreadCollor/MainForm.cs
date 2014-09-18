@@ -21,7 +21,7 @@ namespace ThreadCollor
         **/
         #region Variable declarations
             //A flag which keeps track if there are any threads running
-            private bool threadsRunning = false;
+            //private bool threadsRunning = false;
 
             //The thread manager which has control over all the workers
             ThreadManager threadManager;
@@ -182,21 +182,15 @@ namespace ThreadCollor
             //If there are files waiting to be calculated
             if(fileManager.FilesWaiting > 0)
             {
-                //Pass the listview to the ThreadManager
-                threadManager.setListView(listView_overview);
-            
                 //Lock the controls 
                 button_start.Text = "Stop";
                 button_add.Enabled = false;
                 button_remove.Enabled = false;
                 comboBox_cores.Enabled = false;
                 numericUpDown_threads.Enabled = false;
-            
-                //Set the threads running flag to true
-                threadsRunning = true;
 
                 //Tell the ThreadManager to start the threads
-                threadManager.startThreads(fileManager, (int)numericUpDown_threads.Value);
+                threadManager.startThreads(fileManager, listView_overview,(int)numericUpDown_threads.Value);
                 
                 //Set the time at whicht the threads started running
                 setTime();
@@ -209,7 +203,7 @@ namespace ThreadCollor
         private void stop()
         {
             //If there are still threads running
-            if(threadsRunning)
+            if(threadManager.ThreadsRunning)
             {
                 //Tell the file manager to stop handing out tasks
                 fileManager.setStopFlag();
@@ -244,8 +238,6 @@ namespace ThreadCollor
         /// </summary>
         private void threadsDone()
         {
-            //Set the threadsRunning flag to false
-            threadsRunning = false;
             //Call the stop method
             stop();
         }
