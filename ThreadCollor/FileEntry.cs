@@ -10,21 +10,35 @@ namespace ThreadCollor
 {
     class FileEntry
     {
+        //The FileEntry's location in the ListView
         private int entryNumber = -1;
+        //Var for Filename
         private string fileName;
+        //Var for FilePath
         private string filePath;
+        //Status of completion
         private string status = "Waiting";
+        //Variable for the color and hex values
         private int red = -1;
         private int green = -1;
         private int blue = -1;
         private string hex = String.Empty;
 
+        /// <summary>
+        /// Constructor of the FileEntry class
+        /// </summary>
+        /// <param name="fileName">The fileName with extention (image name)</param>
+        /// <param name="filePath">The path to the file</param>
         public FileEntry(string fileName, string filePath)
         {
+            //Save both values
             this.fileName = fileName;
             this.filePath = filePath;
         }
 
+        /**
+         *  Region containing all the get method from the FileEntry
+        **/
         #region Get
         public int getEntryNumber()
         {
@@ -46,6 +60,10 @@ namespace ThreadCollor
             return status;
         }
 
+        /// <summary>
+        /// Returns the RGB value of red if it's known
+        /// </summary>
+        /// <returns>The RGB value of red</returns>
         public string getRed()
         {
             if(red == -1)
@@ -58,6 +76,10 @@ namespace ThreadCollor
             }
         }
 
+        /// <summary>
+        /// Returns the RGB value of green if it's known
+        /// </summary>
+        /// <returns>The RGB value of green</returns>
         public string getGreen()
         {
             if (green == -1)
@@ -70,6 +92,10 @@ namespace ThreadCollor
             }
         }
 
+        /// <summary>
+        /// Returns the RGB value of blue if it's known
+        /// </summary>
+        /// <returns>The RGB value of blue</returns>
         public string getBlue()
         {
             if (blue == -1)
@@ -95,12 +121,19 @@ namespace ThreadCollor
         }
         #endregion
 
+        /**
+         *  Region containing all the Set method from the FileEntry
+        **/
         #region Set
         public void setEntryNumber(int entryNumber)
         {
             this.entryNumber = entryNumber;
         }
 
+        /// <summary>
+        /// Method that sets the FileEntry's status
+        /// </summary>
+        /// <param name="status">The status to set, can be Waiting, Finished or int between 0 and 100</param>
         public void setStatus(string status)
         {
             //Update the status if the new status is Waiting or Finished
@@ -109,7 +142,7 @@ namespace ThreadCollor
                 this.status = status;
                 return;
             }
-            //If it's not see if it's an percentage (50%)
+            //If it's not see if it's an percentage between 0 and 100
             else
             {
                 try
@@ -135,6 +168,8 @@ namespace ThreadCollor
             if(red >= 0 && red <= 255)
             { 
                 this.red = red;
+                //Try to calculate the hex value
+                setHex();
             }
         }
 
@@ -143,6 +178,8 @@ namespace ThreadCollor
             if (green >= 0 && green <= 255)
             {
                 this.green = green;
+                //Try to calculate the hex value
+                setHex();
             }
         }
 
@@ -151,6 +188,7 @@ namespace ThreadCollor
             if (blue >= 0 && blue <= 255)
             {
                 this.blue = blue;
+                //Try to calculate the hex value
                 setHex();
             }
         }

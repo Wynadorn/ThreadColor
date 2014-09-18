@@ -11,47 +11,68 @@ using System.Drawing;
 
 namespace ThreadCollor
 {
+    /// <summary>
+    /// This class is used to calculate the RGB values of each task and report it back to a FileEntry
+    /// </summary>
     class ColorCalculator : BackgroundWorker
     {
+        //A reference to the ListView
         private ListView listView_overview;
-        private Dictionary<string, int> result;
+        //A reference to the FileManager
         private FileManager fileManager;
+        //A reference to the current FileEntry
+        private FileEntry entry;
+        //The range of pixel's in the FileEntry that have to be calculated
+        private Point range;
         
-        FileEntry entry;
-        Point range;
-
-        //An event handler to tell the thread manager there is no work left to do
+        //An event handler to tell the ThreadManager there is no work left to be done
         public event DoneHandler Done;
         public delegate void DoneHandler(ColorCalculator c, EventArgs e);
 
+        /// <summary>
+        /// Constructor of the ColorCalculater
+        /// </summary>
+        /// <param name="listView_overview">The ListView in which progress will be writen</param>
+        /// <param name="fileManager">The FileManager from which tasks will be gotten</param>
         public ColorCalculator(ListView listView_overview, FileManager fileManager)
         {
+            //Set the FileManager
             this.fileManager = fileManager;
+            //Set the ListView
             this.listView_overview = listView_overview;
-            result = new Dictionary<string,int>();
 
+            //Enable progress reporting
             WorkerReportsProgress = true;
-            WorkerSupportsCancellation = true;
+
+            ////Suport Cacellation
+            //WorkerSupportsCancellation = true;
         }
 
+        /// <summary>
+        /// The method that runs when the thread has started
+        /// </summary>
         protected override void OnDoWork(DoWorkEventArgs e)
         {
+            //Grab task from queue
+            //Thread local reference to the task that has to be done
             KeyValuePair<FileEntry, Point> kvp = fileManager.getTask();
             
+            //If botht the FileEntry and the range have been set
             if(kvp.Key != null && kvp.Value != Point.Empty)
             {
+                //Save them
                 entry = kvp.Key;
                 range = kvp.Value;
 
+                //Create variables to store the avg colors
                 int avgRed = -1,
                     avgGreen = -1,
                     avgBlue = -1;
             
-                //Grab task from queue
-
-                //Load the image into memory
+                //Try incase entry is not a valid Bitmap
                 try
                 {
+                    //Load the image into memory
                     Bitmap image = new Bitmap(entry.getFilePath());
 
                     //Calculate the number of pixels in the image
@@ -75,10 +96,12 @@ namespace ThreadCollor
                             avgBlue += pixel.B;
                         }
 
+                        //Every 25th row report progress
                         if (y % 25 == 0)
                         {
-                            //Report progress after every row
+                            //Calculate the progress
                             double progress = (y * image.Width / (double)numberOfPixels) * 100;
+                            //Report it
                             ReportProgress((int)progress);
                         }
                     }
@@ -96,32 +119,51 @@ namespace ThreadCollor
             }
         }
 
+        /// <summary>
+        /// This method is called when the progress has been changed
+        /// </summary>
         protected override void OnProgressChanged(ProgressChangedEventArgs e)
         {
+            //If there is an active FileEntry
             if(entry != null)
             {
+                //Write the progress to the ListView
                 listView_overview.Items[entry.getEntryNumber()].SubItems[2].Text = e.ProgressPercentage.ToString() + "%";
             }
         }
 
+        /// <summary>
+        /// This method is called when the thread reaches the end of OnDoWork()
+        /// </summary>
         protected override void OnRunWorkerCompleted(RunWorkerCompletedEventArgs e)
         {
+            //If the thread has a current FileEntry
             if(entry != null)
             {
+                //Get a local reference to SubItems
                 System.Windows.Forms.ListViewItem.ListViewSubItemCollection subItems = listView_overview.Items[entry.getEntryNumber()].SubItems;
+                //Set the entry status to finished
                 entry.setStatus("Finished");
+                //Set all the information in the ListView
                 subItems[2].Text = "Finished";
                 subItems[3].Text = entry.getRed();
                 subItems[4].Text = entry.getGreen();
                 subItems[5].Text = entry.getBlue();
-            
+                
+                //Grab the hex value from the entry
                 string hexValue = entry.getHex();
                 subItems[6].Text = hexValue;
+                //If the hex value is not null (visually represented by "-")
                 if (hexValue != "-")
                 {
+                    //Color the background of the cell
                     subItems[7].BackColor = ColorTranslator.FromHtml("#" + hexValue);
+                    //Remove the text placeholder
                     subItems[7].Text = String.Empty;
                 }
+                
+                //Set the entry to null
+                entry = null;
             }
 
             ////If there is still work left to be done

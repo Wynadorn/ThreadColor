@@ -7,6 +7,9 @@ using System.Windows.Forms;
 
 namespace ThreadCollor
 {
+    /// <summary>
+    /// ListViewNF (No Flicker) is used to reduce unnecessary refreshes in the ListView
+    /// </summary>
     class ListViewNF : System.Windows.Forms.ListView
     {
         public ListViewNF()

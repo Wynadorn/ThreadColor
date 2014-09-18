@@ -9,53 +9,50 @@ using System.Windows.Forms;
 
 namespace ThreadCollor
 {
+    /// <summary>
+    /// This class has control over all the worker threads
+    /// </summary>
     class ThreadManager
     {
-        FileManager fileManager;
+        //Create an array of ColorCalculators (workers)
         ColorCalculator[] workers;
-        ListView listView_overview;
+        //A variable that keeps track of the number of workers running
         int tasksRunning = 0;
 
-        //An event handler to tell the form all the threads have finished working
+        //An event handler to tell the MainForm all the threads have finished working
         public event AllThreadsDone allThreadsDone;
         public delegate void AllThreadsDone();
-
-        public void setListView(ListView listView_overview)
+        
+        public void startThreads(FileManager fileManager, ListView listView_overview, int numberOfThreads)
         {
-            this.listView_overview = listView_overview;
-        }
-
-        public void startThreads(FileManager fileManager, int numberOfThreads)
-        {
-            //Create a local copy of the task list
-            this.fileManager = fileManager;
-            
             //Give the workers array a lenght
             workers = new ColorCalculator[numberOfThreads];
 
-            //Fill the workers array with ColorCalculators
+            //For every worker in workers
             for (int i = 0; i < workers.Length; i++)
             {
-                //
-                workers[i] = new ColorCalculator(listView_overview, this.fileManager);
+                //Fill the workers array with ColorCalculators
+                workers[i] = new ColorCalculator(listView_overview, fileManager);
+                //Add a listener that's called when the thread is done working
                 workers[i].Done += new ColorCalculator.DoneHandler(threadFinished);
-            }
 
-            //Set all the workers to work
-            foreach(ColorCalculator worker in workers)
-            {
-                worker.RunWorkerAsync();
-                //Keep track of the number of tasks running
+                //Start the worker
+                workers[i].RunWorkerAsync();
+                //Iterate the number of running workers
                 tasksRunning++;
             }
         }
 
+        /// <summary>
+        /// When all the workers are finished working let the listeners (MainForm) know
+        /// </summary>
         public void threadFinished(object sender, EventArgs e)
         {
             tasksRunning--;
             //If there are no tasks working they're all done
             if(tasksRunning <= 0)
             {
+                //Signal the event
                 allThreadsDone();
             }
         }

@@ -11,6 +11,9 @@ using System.Windows.Forms;
 
 namespace ThreadCollor
 {
+    /// <summary>
+    /// The MainForm class which extends the basic Form
+    /// </summary>
     public partial class MainForm : Form
     {
         /**
