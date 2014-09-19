@@ -53,8 +53,8 @@ namespace ThreadCollor
             //Initialize the form
             InitializeComponent();
 
-            //Prioritize the WinForm thread above the worker threads
-            Thread.CurrentThread.Priority = ThreadPriority.AboveNormal;
+            ////Prioritize the WinForm thread above the worker threads
+            //Thread.CurrentThread.Priority = ThreadPriority.AboveNormal;
         }
 
         /// <summary>
@@ -189,12 +189,12 @@ namespace ThreadCollor
                 button_remove.Enabled = false;
                 comboBox_cores.Enabled = false;
                 numericUpDown_threads.Enabled = false;
-
-                //Tell the ThreadManager to start the threads
-                threadManager.startThreads(fileManager, listView_overview,(int)numericUpDown_threads.Value);
                 
                 //Set the time at whicht the threads started running
                 setTime();
+
+                //Tell the ThreadManager to start the threads
+                threadManager.startThreads(fileManager, listView_overview,(int)numericUpDown_threads.Value);
             }
         }
 
@@ -214,6 +214,9 @@ namespace ThreadCollor
             //Else if there are no threads running
             else
             {
+                //Get the run time
+                double runTime = reportTime().TotalSeconds;
+
                 //Unlock the controls
                 button_start.Text = "Start";
                 button_start.Enabled = true;
@@ -225,9 +228,11 @@ namespace ThreadCollor
                 //Allow the FileManager to hand out tasks
                 fileManager.releaseStopFlag();
 
-                //Calculate the time needed as strings
-                string totalTime = Math.Round(reportTime().TotalSeconds, 2).ToString();
-                string timePerImage = Math.Round(reportTime().TotalSeconds / (imagesWaitingBefore - fileManager.FilesWaiting), 2).ToString();
+                //Calculate the number of tasks completed
+                int tasksCompleted = (imagesWaitingBefore - fileManager.FilesWaiting);
+                //Calculate the time it used, as strings
+                string totalTime = Math.Round(runTime, 2).ToString();
+                string timePerImage = Math.Round(runTime / tasksCompleted , 2).ToString();
                 //Display a MessageBox which shows the total run time and the time per image
                 MessageBox.Show(String.Format("Total running time is {0} seconds. \nThat's {1} seconds for each image.", totalTime, timePerImage),"Run time report");
             }

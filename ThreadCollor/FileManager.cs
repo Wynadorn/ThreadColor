@@ -168,10 +168,6 @@ namespace ThreadCollor
             //If there are any files waiting and the filemanager is allowed to hand out tasks
             if(FilesWaiting > 0 && !stopflag)
             {
-                if(tasklist.Count <= 0)
-                {
-                    createQueue();
-                }
                 //Remove one task from the queue
                 FileEntry entry = tasklist.Dequeue();
                 //Select a pixel range to complete
@@ -209,6 +205,7 @@ namespace ThreadCollor
             files.RemoveAt(i);
             //Delete the tasklist
             tasklist.Clear();
+            createQueue();
         }
 
         /// <summary>
