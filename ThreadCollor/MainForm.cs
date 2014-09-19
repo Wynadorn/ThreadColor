@@ -260,18 +260,15 @@ namespace ThreadCollor
                 //Ask the user which files to add
                 List<string> selectedFiles = askForFiles();
 
-                //Send the files to the FileManager
-                fileManager.add(selectedFiles);
-
-                //If there are files in the FileManager
-                if (fileManager.Count > 0)
+                if(selectedFiles.Count > 0)
                 {
-                    //Enable the start button
+                    //Send the files to the FileManager
+                    fileManager.add(selectedFiles);
+                    
                     button_start.Enabled = true;
+    
+                    updateOverview();
                 }
-
-                //Update the overview with the new items
-                updateOverview();
             }
 
             /// <summary>
