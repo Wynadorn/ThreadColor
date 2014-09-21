@@ -128,6 +128,11 @@ namespace ThreadCollor
         {
             return SizeSuffix(fileSize);
         }
+
+        public long getByteLenght()
+        {
+            return fileSize;
+        }
         #endregion
 
         /**

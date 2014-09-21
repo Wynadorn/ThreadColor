@@ -218,12 +218,12 @@ namespace ThreadCollor
                     if(curSort == "FileSizeA")
                     {
                         curSort = "FileSizeD";
-                        files.Sort((x, y) => -1*String.Compare(x.getFileSize(), y.getFileSize()));
+                        files.Sort((x, y) => -1*x.getByteLenght().CompareTo(y.getByteLenght()));
                     }
                     else
                     {
                         curSort = "FileSizeA";
-                        files.Sort((x, y) => String.Compare(x.getFileSize(), y.getFileSize()));
+                        files.Sort((x, y) => x.getByteLenght().CompareTo(y.getByteLenght()));
                     }
                     break;
                 }
@@ -246,12 +246,13 @@ namespace ThreadCollor
                     if(curSort == "RedA")
                     {
                         curSort = "RedD";
-                        files.Sort((x, y) => -1*String.Compare(x.getRed(), y.getRed()));
+                        
+                        files.Sort((x, y) => -1*Convert.ToInt32(x.getRed()).CompareTo(Convert.ToInt32(y.getRed())));
                     }
                     else
                     {
                         curSort = "RedA";
-                        files.Sort((x, y) => String.Compare(x.getRed(), y.getRed()));
+                        files.Sort((x, y) => Convert.ToInt32(x.getRed()).CompareTo(Convert.ToInt32(y.getRed())));
                     }
                     break;
                 }
@@ -260,12 +261,12 @@ namespace ThreadCollor
                     if(curSort == "GreenA")
                     {
                         curSort = "GreenD";
-                        files.Sort((x, y) => -1*String.Compare(x.getGreen(), y.getGreen()));
+                        files.Sort((x, y) => -1 * Convert.ToInt32(x.getGreen()).CompareTo(Convert.ToInt32(y.getGreen())));
                     }
                     else
                     {
                         curSort = "GreenA";
-                        files.Sort((x, y) => String.Compare(x.getGreen(), y.getGreen()));
+                        files.Sort((x, y) => Convert.ToInt32(x.getGreen()).CompareTo(Convert.ToInt32(y.getGreen())));
                     }
                     break;
                 }
@@ -274,12 +275,12 @@ namespace ThreadCollor
                     if(curSort == "BlueA")
                     {
                         curSort = "BlueD";
-                        files.Sort((x, y) => -1*String.Compare(x.getBlue(), y.getBlue()));
+                        files.Sort((x, y) => -1 * Convert.ToInt32(x.getBlue()).CompareTo(Convert.ToInt32(y.getBlue())));
                     }
                     else
                     {
                         curSort = "BlueA";
-                        files.Sort((x, y) => String.Compare(x.getBlue(), y.getBlue()));
+                        files.Sort((x, y) => Convert.ToInt32(x.getBlue()).CompareTo(Convert.ToInt32(y.getBlue())));
                     }
                     break;
                 }
