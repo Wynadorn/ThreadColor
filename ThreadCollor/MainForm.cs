@@ -17,7 +17,7 @@ namespace ThreadCollor
     public partial class MainForm : Form
     {
         /**
-         *  The Variable declarations within this region. 
+         *  The Variable declarations for this class. 
         **/
         #region Variable declarations
             //A flag which keeps track if there are any threads running
@@ -110,12 +110,12 @@ namespace ThreadCollor
                 entry.setEntryNumber(i);
             }
 
-            //If there are items in the listview
-            if(listView_overview.Items.Count > 0)
-            {
-                //Scrolldown to the bottom of the list
-                listView_overview.EnsureVisible(listView_overview.Items.Count - 1);
-            }
+            ////If there are items in the listview
+            //if(listView_overview.Items.Count > 0)
+            //{
+            //    //Scrolldown to the bottom of the list
+            //    listView_overview.EnsureVisible(listView_overview.Items.Count - 1);
+            //}
 
             //Signal that all the new data has been added
             listView_overview.EndUpdate();
@@ -389,7 +389,7 @@ namespace ThreadCollor
                 //If the form has loaded start recording changes in width
                 if(this.widthChangeFlag)
                 {
-                    int[] columnWidths = new int[8];
+                    int[] columnWidths = new int[listView_overview.Columns.Count];
                     int i = 0;
                     //for each column header
                     foreach (ColumnHeader column in listView_overview.Columns)
@@ -421,6 +421,15 @@ namespace ThreadCollor
             {
                 Properties.Settings.Default.Cores = Convert.ToInt32(comboBox_cores.Text);
                 Properties.Settings.Default.Save();
+            }
+
+            private void listView_overview_ColumnClick(object sender, ColumnClickEventArgs e)
+            {
+                //Grab the index of the selected column
+                Int32 colIndex = Convert.ToInt32(e.Column.ToString());
+
+                fileManager.sort(listView_overview.Columns[colIndex].Text);
+                updateOverview();
             }
         #endregion
     }

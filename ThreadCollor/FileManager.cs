@@ -21,6 +21,9 @@ namespace ThreadCollor
         //Which in turn will stop all the workers because there is no more work
         private bool stopflag = false;
 
+        //Current sort, used to toggle between acending and decending
+        private string curSort = "none";
+
         /// <summary>
         /// A public reference to Count
         /// </summary>
@@ -105,61 +108,7 @@ namespace ThreadCollor
             return files;
         }
 
-        /// <summary>
-        /// Sorts the files by name
-        /// </summary>
-        /// <param name="acending">A bool if the list has to be storted aceding or decending</param>
-        public void sortFileName(bool acending = true)
-        {
-            //Do sorting
-        }
-
-        /// <summary>
-        /// Sorts the files by filepath
-        /// </summary>
-        /// <param name="acending">A bool if the list has to be storted aceding or decending</param>
-        public void sortFilePath(bool acending = true)
-        {
-
-        }
-
-        /// <summary>
-        /// Sorts the files by status
-        /// </summary>
-        /// <param name="acending">A bool if the list has to be storted aceding or decending</param>
-        public void sortStatus(bool acending = true)
-        {
-
-        }
-
-        /// <summary>
-        /// Sorts the files by red RGB value
-        /// </summary>
-        /// <param name="acending">A bool if the list has to be storted aceding or decending</param>
-        public void sortRed(bool acending = true)
-        {
-
-        }
-
-        /// <summary>
-        /// Sorts the files by green RGB value
-        /// </summary>
-        /// <param name="acending">A bool if the list has to be storted aceding or decending</param>
-        public void sortGreen(bool acending = true)
-        {
-
-        }
-
-        /// <summary>
-        /// Sorts the files by blue RGB value
-        /// </summary>
-        /// <param name="acending">A bool if the list has to be storted aceding or decending</param>
-        public void sortBlue(bool acending = true)
-        {
-
-        }
-
-        /// <summary>
+            /// <summary>
         /// This method returns a task, which can be completed by workers
         /// </summary>
         /// <returns>The task that has to be completed</returns>
@@ -184,12 +133,19 @@ namespace ThreadCollor
             }
         }
 
+        /// <summary>
+        /// Create the taskList
+        /// </summary>
         private void createQueue()
         {
+            tasklist.Clear();
+            //For each entry in files
             foreach(FileEntry entry in files)
             {
+                //If the status is wating
                 if(entry.getStatus() == "Waiting")
                 {
+                    //Add it to the queue
                     tasklist.Enqueue(entry);
                 }
             }
@@ -223,5 +179,207 @@ namespace ThreadCollor
         {
             stopflag = false;
         }
+
+        public void sort(string Type)
+        {
+            //A case switch which determains which sort method needs to be called
+            switch(Type)
+            {
+                case "Filename":
+                {
+                    if(curSort == "FilenameA")
+                    {
+                        curSort = "FilenameD";
+                        files.Sort((x, y) => -1*String.Compare(x.getFileName(), y.getFileName()));
+                    }
+                    else
+                    {
+                        curSort = "FilenameA";
+                        files.Sort((x, y) => String.Compare(x.getFileName(), y.getFileName()));
+                    }
+                    break;
+                }
+                case "File path":
+                {
+                    if(curSort == "FilePathA")
+                    {
+                        curSort = "FilePathD";
+                        files.Sort((x, y) => -1*String.Compare(x.getFilePath(), y.getFilePath()));
+                    }
+                    else
+                    {
+                        curSort = "FilePathA";
+                        files.Sort((x, y) => String.Compare(x.getFilePath(), y.getFilePath()));
+                    }
+                    break;
+                }
+                case "Size":
+                {
+                    if(curSort == "FileSizeA")
+                    {
+                        curSort = "FileSizeD";
+                        files.Sort((x, y) => -1*String.Compare(x.getFileSize(), y.getFileSize()));
+                    }
+                    else
+                    {
+                        curSort = "FileSizeA";
+                        files.Sort((x, y) => String.Compare(x.getFileSize(), y.getFileSize()));
+                    }
+                    break;
+                }
+                case "Status":
+                {
+                    if(curSort == "StatusA")
+                    {
+                        curSort = "StatusD";
+                        files.Sort((x, y) => -1*String.Compare(x.getStatus(), y.getStatus()));
+                    }
+                    else
+                    {
+                        curSort = "StatusA";
+                        files.Sort((x, y) => String.Compare(x.getStatus(), y.getStatus()));
+                    }
+                    break;
+                }
+                case "Red":
+                {
+                    if(curSort == "RedA")
+                    {
+                        curSort = "RedD";
+                        files.Sort((x, y) => -1*String.Compare(x.getRed(), y.getRed()));
+                    }
+                    else
+                    {
+                        curSort = "RedA";
+                        files.Sort((x, y) => String.Compare(x.getRed(), y.getRed()));
+                    }
+                    break;
+                }
+                case "Green":
+                {
+                    if(curSort == "GreenA")
+                    {
+                        curSort = "GreenD";
+                        files.Sort((x, y) => -1*String.Compare(x.getGreen(), y.getGreen()));
+                    }
+                    else
+                    {
+                        curSort = "GreenA";
+                        files.Sort((x, y) => String.Compare(x.getGreen(), y.getGreen()));
+                    }
+                    break;
+                }
+                case "Blue":
+                {
+                    if(curSort == "BlueA")
+                    {
+                        curSort = "BlueD";
+                        files.Sort((x, y) => -1*String.Compare(x.getBlue(), y.getBlue()));
+                    }
+                    else
+                    {
+                        curSort = "BlueA";
+                        files.Sort((x, y) => String.Compare(x.getBlue(), y.getBlue()));
+                    }
+                    break;
+                }
+                case "Hex":
+                {
+                    if(curSort == "HexA")
+                    {
+                        curSort = "HexD";
+                        files.Sort((x, y) => -1*String.Compare(x.getHex(), y.getHex()));
+                    }
+                    else
+                    {
+                        curSort = "HexA";
+                        files.Sort((x, y) => String.Compare(x.getHex(), y.getHex()));
+                    }
+                    break;
+                }
+                default:
+                {
+                    break;
+                }
+            }
+            createQueue();
+        }
     }
 }
+
+///**
+// *  Region that contains all the methods used for sorting the files 
+//**/
+//#region Sorting
+//    /// <summary>
+//    /// Sorts the files by name
+//    /// </summary>
+//    /// <param name="acending">A bool if the list has to be storted aceding or decending</param>
+//    public void sortFileName(bool acending = true)
+//    {
+//        //Do sorting
+//    }
+
+//    /// <summary>
+//    /// Sorts the files by filepath
+//    /// </summary>
+//    /// <param name="acending">A bool if the list has to be storted aceding or decending</param>
+//    public void sortFilePath(bool acending = true)
+//    {
+
+//    }
+
+//    /// <summary>
+//    /// Sorts the files by size
+//    /// </summary>
+//    /// <param name="acending">A bool if the list has to be storted aceding or decending</param>
+//    public void sortSize(bool acending = true)
+//    {
+
+//    }
+
+//    /// <summary>
+//    /// Sorts the files by status
+//    /// </summary>
+//    /// <param name="acending">A bool if the list has to be storted aceding or decending</param>
+//    public void sortStatus(bool acending = true)
+//    {
+
+//    }
+
+//    /// <summary>
+//    /// Sorts the files by red RGB value
+//    /// </summary>
+//    /// <param name="acending">A bool if the list has to be storted aceding or decending</param>
+//    public void sortRed(bool acending = true)
+//    {
+
+//    }
+
+//    /// <summary>
+//    /// Sorts the files by green RGB value
+//    /// </summary>
+//    /// <param name="acending">A bool if the list has to be storted aceding or decending</param>
+//    public void sortGreen(bool acending = true)
+//    {
+
+//    }
+
+//    /// <summary>
+//    /// Sorts the files by blue RGB value
+//    /// </summary>
+//    /// <param name="acending">A bool if the list has to be storted aceding or decending</param>
+//    public void sortBlue(bool acending = true)
+//    {
+
+//    }
+
+//    /// <summary>
+//    /// Sorts the files by hex value
+//    /// </summary>
+//    /// <param name="acending">A bool if the list has to be storted aceding or decending</param>
+//    public void sortHex(bool acending = true)
+//    {
+
+//    }
+//#endregion
