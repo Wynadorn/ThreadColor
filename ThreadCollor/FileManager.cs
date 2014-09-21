@@ -284,6 +284,7 @@ namespace ThreadCollor
                     break;
                 }
                 case "Hex":
+                case "Color":
                 {
                     if(curSort == "HexA")
                     {
