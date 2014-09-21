@@ -49,7 +49,7 @@ namespace ThreadCollor.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("105,304,60,60,60,60,60,40")]
+        [global::System.Configuration.DefaultSettingValueAttribute("105,304,60,60,60,60,60,60,40")]
         public string ColumnWidths {
             get {
                 return ((string)(this["ColumnWidths"]));

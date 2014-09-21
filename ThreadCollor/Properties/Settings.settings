@@ -9,7 +9,7 @@
       <Value Profile="(Default)">0, 0</Value>
     </Setting>
     <Setting Name="ColumnWidths" Type="System.String" Scope="User">
-      <Value Profile="(Default)">105,304,60,60,60,60,60,40</Value>
+      <Value Profile="(Default)">105,304,60,60,60,60,60,60,40</Value>
     </Setting>
     <Setting Name="Threads" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">4</Value>
