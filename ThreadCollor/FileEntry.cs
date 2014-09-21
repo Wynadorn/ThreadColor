@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,6 +24,7 @@ namespace ThreadCollor
         private int green = -1;
         private int blue = -1;
         private string hex = String.Empty;
+        private long fileSize = -1;
 
         /// <summary>
         /// Constructor of the FileEntry class
@@ -34,6 +36,8 @@ namespace ThreadCollor
             //Save both values
             this.fileName = fileName;
             this.filePath = filePath;
+            FileInfo f = new FileInfo(filePath);
+            this.fileSize = f.Length;
         }
 
         /**
@@ -119,6 +123,11 @@ namespace ThreadCollor
                 return hex;
             }
         }
+
+        public string getFileSize()
+        {
+            return SizeSuffix(fileSize);
+        }
         #endregion
 
         /**
@@ -203,5 +212,18 @@ namespace ThreadCollor
             }
         }
         #endregion
+
+        //http://stackoverflow.com/a/14488941/4022492
+        static readonly string[] SizeSuffixes = { "bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
+        static string SizeSuffix(Int64 value)
+        {
+            if (value < 0) { return "-" + SizeSuffix(-value); }
+            if (value == 0) { return "0.0 bytes"; }
+
+            int mag = (int)Math.Log(value, 1024);
+            decimal adjustedSize = (decimal)value / (1L << (mag * 10));
+
+            return string.Format("{0:n1} {1}", adjustedSize, SizeSuffixes[mag]);
+        }
     }
 }

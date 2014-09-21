@@ -74,33 +74,34 @@ namespace ThreadCollor
                 FileEntry entry = fileManager[i];
 
                 //Create a new ListViewItem (a row)
-                ListViewItem newEntry = new ListViewItem(new String[8]);
+                ListViewItem newEntry = new ListViewItem(new String[listView_overview.Columns.Count]);
                 //Allow individual cells to apply their own style, This is used for the Color cell
                 newEntry.UseItemStyleForSubItems = false;
 
                 //Fill all known information into the cells
                 newEntry.SubItems[0].Text = entry.getFileName();
                 newEntry.SubItems[1].Text = entry.getFilePath();
-                newEntry.SubItems[2].Text = entry.getStatus();
-                newEntry.SubItems[3].Text = entry.getRed();
-                newEntry.SubItems[4].Text = entry.getGreen();
-                newEntry.SubItems[5].Text = entry.getBlue();
+                newEntry.SubItems[2].Text = entry.getFileSize();
+                newEntry.SubItems[3].Text = entry.getStatus();
+                newEntry.SubItems[4].Text = entry.getRed();
+                newEntry.SubItems[5].Text = entry.getGreen();
+                newEntry.SubItems[6].Text = entry.getBlue();
                 //Grab the hex value from the entry
                 string hexValue = entry.getHex();
-                newEntry.SubItems[6].Text = hexValue;
+                newEntry.SubItems[7].Text = hexValue;
                 //If the hexvalue is not "-" (representing null)
                 if(hexValue != "-")
                 {
                     //Color in the color cell
-                    newEntry.SubItems[7].BackColor = ColorTranslator.FromHtml("#" + hexValue);
+                    newEntry.SubItems[8].BackColor = ColorTranslator.FromHtml("#" + hexValue);
                     //Remove the placeholder text ("-")
-                    newEntry.SubItems[7].Text = String.Empty;
+                    newEntry.SubItems[8].Text = String.Empty;
                 }
                 //If the hex value is unknown
                 else
                 {
                     //Fill the cell with placeholder text
-                    newEntry.SubItems[7].Text = "-";
+                    newEntry.SubItems[8].Text = "-";
                 }
 
                 //Add the entry to the ListView

@@ -46,6 +46,7 @@
             this.listView_overview = new ThreadCollor.ListViewNF();
             this.columnHeader_filename = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader_filepath = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader_size = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader_status = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader_red = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader_green = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -238,6 +239,7 @@
             this.listView_overview.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader_filename,
             this.columnHeader_filepath,
+            this.columnHeader_size,
             this.columnHeader_status,
             this.columnHeader_red,
             this.columnHeader_green,
@@ -258,37 +260,47 @@
             // columnHeader_filename
             // 
             this.columnHeader_filename.Text = "Filename";
-            this.columnHeader_filename.Width = 105;
+            this.columnHeader_filename.Width = 121;
             // 
             // columnHeader_filepath
             // 
             this.columnHeader_filepath.Text = "File path";
-            this.columnHeader_filepath.Width = 272;
+            this.columnHeader_filepath.Width = 293;
+            // 
+            // columnHeader_size
+            // 
+            this.columnHeader_size.Text = "Size";
+            this.columnHeader_size.Width = 45;
             // 
             // columnHeader_status
             // 
             this.columnHeader_status.Text = "Status";
+            this.columnHeader_status.Width = 45;
             // 
             // columnHeader_red
             // 
             this.columnHeader_red.Text = "Red";
+            this.columnHeader_red.Width = 45;
             // 
             // columnHeader_green
             // 
             this.columnHeader_green.Text = "Green";
+            this.columnHeader_green.Width = 45;
             // 
             // columnHeader_blue
             // 
             this.columnHeader_blue.Text = "Blue";
+            this.columnHeader_blue.Width = 45;
             // 
             // columnHeader_hex
             // 
             this.columnHeader_hex.Text = "Hex";
+            this.columnHeader_hex.Width = 45;
             // 
             // columnHeader_color
             // 
             this.columnHeader_color.Text = "Color";
-            this.columnHeader_color.Width = 40;
+            this.columnHeader_color.Width = 45;
             // 
             // MainForm
             // 
@@ -328,6 +340,7 @@
         private System.Windows.Forms.Button button_add;
         private System.Windows.Forms.ColumnHeader columnHeader_filename;
         private System.Windows.Forms.ColumnHeader columnHeader_filepath;
+        private System.Windows.Forms.ColumnHeader columnHeader_size;
         private System.Windows.Forms.ColumnHeader columnHeader_red;
         private System.Windows.Forms.ColumnHeader columnHeader_green;
         private System.Windows.Forms.ColumnHeader columnHeader_blue;

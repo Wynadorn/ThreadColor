@@ -128,7 +128,7 @@ namespace ThreadCollor
             if(entry != null)
             {
                 //Write the progress to the ListView
-                listView_overview.Items[entry.getEntryNumber()].SubItems[2].Text = e.ProgressPercentage.ToString() + "%";
+                listView_overview.Items[entry.getEntryNumber()].SubItems[3].Text = e.ProgressPercentage.ToString() + "%";
             }
         }
 
@@ -145,21 +145,21 @@ namespace ThreadCollor
                 //Set the entry status to finished
                 entry.setStatus("Finished");
                 //Set all the information in the ListView
-                subItems[2].Text = "Finished";
-                subItems[3].Text = entry.getRed();
-                subItems[4].Text = entry.getGreen();
-                subItems[5].Text = entry.getBlue();
+                subItems[3].Text = "Finished";
+                subItems[4].Text = entry.getRed();
+                subItems[5].Text = entry.getGreen();
+                subItems[6].Text = entry.getBlue();
                 
                 //Grab the hex value from the entry
                 string hexValue = entry.getHex();
-                subItems[6].Text = hexValue;
+                subItems[7].Text = hexValue;
                 //If the hex value is not null (visually represented by "-")
                 if (hexValue != "-")
                 {
                     //Color the background of the cell
-                    subItems[7].BackColor = ColorTranslator.FromHtml("#" + hexValue);
+                    subItems[8].BackColor = ColorTranslator.FromHtml("#" + hexValue);
                     //Remove the text placeholder
-                    subItems[7].Text = String.Empty;
+                    subItems[8].Text = String.Empty;
                 }
                 
                 //Set the entry to null
