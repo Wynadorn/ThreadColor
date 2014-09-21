@@ -133,17 +133,14 @@
             // comboBox_cores
             // 
             this.comboBox_cores.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.comboBox_cores.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBox_cores.FormattingEnabled = true;
             this.comboBox_cores.Items.AddRange(new object[] {
-            "1",
-            "2",
-            "3",
-            "4"});
+            "1"});
             this.comboBox_cores.Location = new System.Drawing.Point(357, 236);
             this.comboBox_cores.Name = "comboBox_cores";
             this.comboBox_cores.Size = new System.Drawing.Size(50, 21);
             this.comboBox_cores.TabIndex = 7;
-            this.comboBox_cores.Text = "1";
             this.comboBox_cores.TextChanged += new System.EventHandler(this.comboBox_cores_TextChanged);
             // 
             // label_threads

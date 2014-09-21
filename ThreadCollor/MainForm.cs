@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Management;
 
 namespace ThreadCollor
 {
@@ -52,6 +53,14 @@ namespace ThreadCollor
 
             //Initialize the form
             InitializeComponent();
+
+            //Set the max number of logical processors
+            comboBox_cores.Items.Clear();
+            for(int i = 1; i <= Environment.ProcessorCount; i++)
+            {
+                comboBox_cores.SelectedIndex = comboBox_cores.Items.Add(i);
+            }
+
 
             ////Prioritize the WinForm thread above the worker threads
             //Thread.CurrentThread.Priority = ThreadPriority.AboveNormal;
@@ -362,9 +371,13 @@ namespace ThreadCollor
                         i++;
                     }
                 }
+
+                comboBox_cores.Items.Clear();
+                for (int i = 1; i <= Environment.ProcessorCount; i++)
+                {
+                    comboBox_cores.SelectedIndex = comboBox_cores.Items.Add(i);
+                }
                 
-                //Restore the number of cores
-                comboBox_cores.Text = Properties.Settings.Default.Cores.ToString();
                 //Restore the number of threads
                 numericUpDown_threads.Value = Properties.Settings.Default.Threads;
 
@@ -419,8 +432,8 @@ namespace ThreadCollor
             /// </summary>
             private void comboBox_cores_TextChanged(object sender, EventArgs e)
             {
-                Properties.Settings.Default.Cores = Convert.ToInt32(comboBox_cores.Text);
-                Properties.Settings.Default.Save();
+                //Properties.Settings.Default.Cores = Convert.ToInt32(comboBox_cores.Items[0]);
+                //Properties.Settings.Default.Save();
             }
 
             private void listView_overview_ColumnClick(object sender, ColumnClickEventArgs e)
