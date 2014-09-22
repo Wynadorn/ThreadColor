@@ -30,7 +30,7 @@ namespace ThreadCollor
         public event AllThreadsDone allThreadsDone;
         public delegate void AllThreadsDone();
         
-        public void startThreads(FileManager fileManager, ListView listView_overview, int numberOfThreads)
+        public void startThreads(FileManager fileManager, ListView listView_overview, int numberOfThreads, int numberOfCores)
         {
             //Give the workers array a lenght
             workers = new ColorCalculator[numberOfThreads];
@@ -42,7 +42,7 @@ namespace ThreadCollor
             for (int i = 0; i < workers.Length; i++)
             {
                 //Fill the workers array with ColorCalculators
-                workers[i] = new ColorCalculator(listView_overview, fileManager);
+                workers[i] = new ColorCalculator(listView_overview, fileManager, i%numberOfCores);
                 //Add a listener that's called when the thread is done working
                 workers[i].Done += new ColorCalculator.DoneHandler(threadFinished);
 

@@ -204,7 +204,7 @@ namespace ThreadCollor
                 setTime();
 
                 //Tell the ThreadManager to start the threads
-                threadManager.startThreads(fileManager, listView_overview,(int)numericUpDown_threads.Value);
+                threadManager.startThreads(fileManager, listView_overview,(int)numericUpDown_threads.Value, Convert.ToInt32(comboBox_cores.Text));
             }
         }
 
