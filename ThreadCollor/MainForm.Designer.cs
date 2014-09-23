@@ -42,7 +42,7 @@
             this.textBox_filter = new System.Windows.Forms.TextBox();
             this.label_filter = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
+            this.numericUpDown_tpi = new System.Windows.Forms.NumericUpDown();
             this.listView_overview = new ThreadCollor.ListViewNF();
             this.columnHeader_filename = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader_filepath = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -54,7 +54,7 @@
             this.columnHeader_hex = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader_color = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_threads)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_tpi)).BeginInit();
             this.SuspendLayout();
             // 
             // button_add
@@ -134,6 +134,7 @@
             // 
             this.comboBox_cores.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.comboBox_cores.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox_cores.Enabled = false;
             this.comboBox_cores.FormattingEnabled = true;
             this.comboBox_cores.Items.AddRange(new object[] {
             "1"});
@@ -141,6 +142,7 @@
             this.comboBox_cores.Name = "comboBox_cores";
             this.comboBox_cores.Size = new System.Drawing.Size(50, 21);
             this.comboBox_cores.TabIndex = 7;
+            this.comboBox_cores.Visible = false;
             this.comboBox_cores.TextChanged += new System.EventHandler(this.comboBox_cores_TextChanged);
             // 
             // label_threads
@@ -157,11 +159,13 @@
             // 
             this.label_cores.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label_cores.AutoSize = true;
+            this.label_cores.Enabled = false;
             this.label_cores.Location = new System.Drawing.Point(289, 239);
             this.label_cores.Name = "label_cores";
             this.label_cores.Size = new System.Drawing.Size(34, 13);
             this.label_cores.TabIndex = 9;
             this.label_cores.Text = "Cores";
+            this.label_cores.Visible = false;
             // 
             // numericUpDown_threads
             // 
@@ -215,19 +219,19 @@
             this.label1.TabIndex = 13;
             this.label1.Text = "Thread per image";
             // 
-            // numericUpDown1
+            // numericUpDown_tpi
             // 
-            this.numericUpDown1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.numericUpDown1.Location = new System.Drawing.Point(213, 266);
-            this.numericUpDown1.Minimum = new decimal(new int[] {
+            this.numericUpDown_tpi.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.numericUpDown_tpi.Location = new System.Drawing.Point(213, 266);
+            this.numericUpDown_tpi.Minimum = new decimal(new int[] {
             1,
             0,
             0,
             0});
-            this.numericUpDown1.Name = "numericUpDown1";
-            this.numericUpDown1.Size = new System.Drawing.Size(50, 20);
-            this.numericUpDown1.TabIndex = 14;
-            this.numericUpDown1.Value = new decimal(new int[] {
+            this.numericUpDown_tpi.Name = "numericUpDown_tpi";
+            this.numericUpDown_tpi.Size = new System.Drawing.Size(50, 20);
+            this.numericUpDown_tpi.TabIndex = 14;
+            this.numericUpDown_tpi.Value = new decimal(new int[] {
             4,
             0,
             0,
@@ -310,7 +314,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(733, 297);
-            this.Controls.Add(this.numericUpDown1);
+            this.Controls.Add(this.numericUpDown_tpi);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.label_filter);
             this.Controls.Add(this.textBox_filter);
@@ -332,7 +336,7 @@
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.SizeChanged += new System.EventHandler(this.MainForm_SizeChanged);
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_threads)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_tpi)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -363,7 +367,7 @@
         private System.Windows.Forms.Label label_filter;
         private ListViewNF listView_overview;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.NumericUpDown numericUpDown1;
+        private System.Windows.Forms.NumericUpDown numericUpDown_tpi;
     }
 }
 

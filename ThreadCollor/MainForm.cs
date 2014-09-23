@@ -203,6 +203,8 @@ namespace ThreadCollor
                 //Set the time at whicht the threads started running
                 setTime();
 
+                //Send the threads per image to the file manager
+                fileManager.setThreadsPerImage((int)numericUpDown_tpi.Value);
                 //Tell the ThreadManager to start the threads
                 threadManager.startThreads(fileManager, listView_overview,(int)numericUpDown_threads.Value, Convert.ToInt32(comboBox_cores.Text));
             }
@@ -423,6 +425,7 @@ namespace ThreadCollor
             /// </summary>
             private void numericUpDown_threads_ValueChanged(object sender, EventArgs e)
             {
+                numericUpDown_tpi.Maximum = numericUpDown_threads.Value;
                 Properties.Settings.Default.Threads = (int)numericUpDown_threads.Value;
                 Properties.Settings.Default.Save();
             }

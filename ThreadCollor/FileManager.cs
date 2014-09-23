@@ -15,7 +15,7 @@ namespace ThreadCollor
         //A list of all the files contained in the FileManager
         private List<FileEntry> files = new List<FileEntry>();
         //A queue containing all the work that has to be done
-        private Queue<FileEntry> tasklist = new Queue<FileEntry>();
+        private Queue<KeyValuePair<FileEntry, Point>> tasklist = new Queue<KeyValuePair<FileEntry, Point>>();
 
         //A flag that when set stops the FileManager fram handing out new tasks
         //Which in turn will stop all the workers because there is no more work
@@ -23,6 +23,11 @@ namespace ThreadCollor
 
         //Current sort, used to toggle between acending and decending
         private string curSort = "none";
+
+        //The number of threads on one image
+        private int threadsPerImage;
+
+        private decimal filesWaiting = 0;
 
         /// <summary>
         /// A public reference to Count
@@ -44,7 +49,7 @@ namespace ThreadCollor
                 if(!stopflag)
                 {
                     //Return the actual number of tasks
-                    return tasklist.Count;
+                    return (int)Math.Ceiling(filesWaiting);
                 }
                 //If the stop flag has been set
                 else
@@ -62,7 +67,6 @@ namespace ThreadCollor
         public FileEntry this[int i]
         {
             get{ return files[i]; }
-            //set { InnerList[i] = value; }
         }
 
         /// <summary>
@@ -76,10 +80,10 @@ namespace ThreadCollor
             FileEntry entry = new FileEntry(fileName, filePath);
             //Add the entry to the files list
             files.Add(entry);
-            //Add the entry to the queue, because new tasks are never compled
-            tasklist.Enqueue(entry);
-        }
 
+            filesWaiting++;
+        }
+        
         /// <summary>
         /// Add a list of filepaths to the FileManager
         /// </summary>
@@ -117,13 +121,10 @@ namespace ThreadCollor
             //If there are any files waiting and the filemanager is allowed to hand out tasks
             if(FilesWaiting > 0 && !stopflag)
             {
-                //Remove one task from the queue
-                FileEntry entry = tasklist.Dequeue();
-                //Select a pixel range to complete
-                Point range = new Point(50,100);
-
+                //Decrease files waiting
+                filesWaiting -= (1/threadsPerImage);
                 //Return the value
-                return new KeyValuePair<FileEntry, Point>(entry, range);
+                return tasklist.Dequeue();
             }
             //If there are no tasks or the FileManager isn't allowed to release tasks
             else
@@ -145,10 +146,33 @@ namespace ThreadCollor
                 //If the status is wating
                 if(entry.getStatus() == "Waiting")
                 {
-                    //Add it to the queue
-                    tasklist.Enqueue(entry);
+                    if(threadsPerImage > 1)
+                    {
+                        //Get the image height
+                        int height = new Bitmap(entry.getFilePath()).Height;
+                        
+                        for(int i = 0; i<threadsPerImage; i++)
+                        {
+                            Point range = new Point((height/threadsPerImage)*i, (height/threadsPerImage)*(i+1));
+                            tasklist.Enqueue(new KeyValuePair<FileEntry, Point>(entry, range));
+                        }
+                    }
+                    else
+                    {
+                        //Add it to the queue
+                        tasklist.Enqueue(new KeyValuePair<FileEntry, Point>(entry, Point.Empty));
+                    }
                 }
             }
+        }
+
+        /// <summary>
+        /// Sets the number of threads per image
+        /// </summary>
+        /// <param name="threadsPerImage">int</param>
+        public void setThreadsPerImage(int threadsPerImage)
+        {
+            this.threadsPerImage = threadsPerImage;
         }
 
         /// <summary>
