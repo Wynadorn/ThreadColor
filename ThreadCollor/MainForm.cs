@@ -205,6 +205,7 @@ namespace ThreadCollor
 
                 //Send the threads per image to the file manager
                 fileManager.setThreadsPerImage((int)numericUpDown_tpi.Value);
+                fileManager.createQueue();
                 //Tell the ThreadManager to start the threads
                 threadManager.startThreads(fileManager, listView_overview,(int)numericUpDown_threads.Value, Convert.ToInt32(comboBox_cores.Text));
             }
@@ -297,6 +298,7 @@ namespace ThreadCollor
                         //Remove the item at location i in the FileManager
                         fileManager.removeAt(i);
                     }
+                    fileManager.createQueue();
                 }
 
                 //Update the ListView to remove the items

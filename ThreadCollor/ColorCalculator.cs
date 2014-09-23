@@ -59,7 +59,7 @@ namespace ThreadCollor
             KeyValuePair<FileEntry, Point> kvp = fileManager.getTask();
             
             //If botht the FileEntry and the range have been set
-            if(kvp.Key != null && kvp.Value != Point.Empty)
+            if(kvp.Key != null)
             {
                 //Save them
                 entry = kvp.Key;
@@ -83,7 +83,7 @@ namespace ThreadCollor
                     ReportProgress(0);
 
                     //For every row of pixels
-                    for (int y = 0; y < image.Height; y++)
+                    for (int y = range.X; y < range.Y; y++)
                     {
                         //For every colum of pixels
                         for (int x = 0; x < image.Width; x++)

@@ -122,7 +122,7 @@ namespace ThreadCollor
             if(FilesWaiting > 0 && !stopflag)
             {
                 //Decrease files waiting
-                filesWaiting -= (1/threadsPerImage);
+                filesWaiting -= (1/(decimal)threadsPerImage);
                 //Return the value
                 return tasklist.Dequeue();
             }
@@ -130,6 +130,7 @@ namespace ThreadCollor
             else
             {
                 //Return an empty task
+                tasklist.Clear();
                 return new KeyValuePair<FileEntry, Point>(null, Point.Empty);
             }
         }
@@ -137,7 +138,7 @@ namespace ThreadCollor
         /// <summary>
         /// Create the taskList
         /// </summary>
-        private void createQueue()
+        public void createQueue()
         {
             tasklist.Clear();
             //For each entry in files
@@ -146,22 +147,22 @@ namespace ThreadCollor
                 //If the status is wating
                 if(entry.getStatus() == "Waiting")
                 {
-                    if(threadsPerImage > 1)
-                    {
+                    //if(threadsPerImage > 1)
+                    //{
                         //Get the image height
                         int height = new Bitmap(entry.getFilePath()).Height;
                         
                         for(int i = 0; i<threadsPerImage; i++)
                         {
-                            Point range = new Point((height/threadsPerImage)*i, (height/threadsPerImage)*(i+1));
+                            Point range = new Point((height/threadsPerImage)*i, ((height/threadsPerImage)*(i+1)-1));
                             tasklist.Enqueue(new KeyValuePair<FileEntry, Point>(entry, range));
                         }
-                    }
-                    else
-                    {
+                    //}
+                    //else
+                    //{
                         //Add it to the queue
-                        tasklist.Enqueue(new KeyValuePair<FileEntry, Point>(entry, Point.Empty));
-                    }
+                        //tasklist.Enqueue(new KeyValuePair<FileEntry, Point>(entry, Point.Empty));
+                    //}
                 }
             }
         }
@@ -183,9 +184,8 @@ namespace ThreadCollor
         {
             //Remove the file at i
             files.RemoveAt(i);
-            //Delete the tasklist
-            tasklist.Clear();
-            createQueue();
+            //Decrease files waiting
+            filesWaiting --;
         }
 
         /// <summary>
@@ -328,7 +328,6 @@ namespace ThreadCollor
                     break;
                 }
             }
-            createQueue();
         }
     }
 }
