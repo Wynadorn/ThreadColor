@@ -25,9 +25,9 @@ namespace ThreadCollor
         private string curSort = "none";
 
         //The number of threads on one image
-        private int threadsPerImage;
+        private int threadsPerImage = 1;
 
-        private decimal filesWaiting = 0;
+        private double filesWaiting = 0;
 
         /// <summary>
         /// A public reference to Count
@@ -41,7 +41,7 @@ namespace ThreadCollor
         /// <summary>
         /// Public reference to the queue lenght
         /// </summary>
-        public int FilesWaiting
+        public double FilesWaiting
         {
             get
             {
@@ -49,7 +49,7 @@ namespace ThreadCollor
                 if(!stopflag)
                 {
                     //Return the actual number of tasks
-                    return (int)Math.Ceiling(filesWaiting);
+                    return Math.Ceiling(Math.Round(filesWaiting, 2));
                 }
                 //If the stop flag has been set
                 else
@@ -77,7 +77,7 @@ namespace ThreadCollor
         private void add(string fileName, string filePath)
         {
             //Local reference to the entry
-            FileEntry entry = new FileEntry(fileName, filePath);
+            FileEntry entry = new FileEntry(fileName, filePath, threadsPerImage);
             //Add the entry to the files list
             files.Add(entry);
 
@@ -122,7 +122,7 @@ namespace ThreadCollor
             if(FilesWaiting > 0 && !stopflag)
             {
                 //Decrease files waiting
-                filesWaiting -= (1/(decimal)threadsPerImage);
+                filesWaiting -= (1/(double)threadsPerImage);
                 //Return the value
                 return tasklist.Dequeue();
             }
@@ -149,12 +149,10 @@ namespace ThreadCollor
                 {
                     //if(threadsPerImage > 1)
                     //{
-                        //Get the image height
-                        int height = new Bitmap(entry.getFilePath()).Height;
-                        
+                        int entryHeight = entry.Height;
                         for(int i = 0; i<threadsPerImage; i++)
                         {
-                            Point range = new Point((height/threadsPerImage)*i, ((height/threadsPerImage)*(i+1)-1));
+                            Point range = new Point((entryHeight/threadsPerImage)*i, ((entryHeight/threadsPerImage)*(i+1)-1));
                             tasklist.Enqueue(new KeyValuePair<FileEntry, Point>(entry, range));
                         }
                     //}
@@ -174,6 +172,10 @@ namespace ThreadCollor
         public void setThreadsPerImage(int threadsPerImage)
         {
             this.threadsPerImage = threadsPerImage;
+            foreach(FileEntry entry in files)
+            {
+                entry.setThreadsPerImage(threadsPerImage);
+            }
         }
 
         /// <summary>

@@ -66,9 +66,9 @@ namespace ThreadCollor
                 range = kvp.Value;
 
                 //Create variables to store the avg colors
-                int avgRed = -1,
-                    avgGreen = -1,
-                    avgBlue = -1;
+                double avgRed = -1,
+                       avgGreen = -1,
+                       avgBlue = -1;
             
                 //Try incase entry is not a valid Bitmap
                 try
@@ -76,8 +76,14 @@ namespace ThreadCollor
                     //Load the image into memory
                     Bitmap image = new Bitmap(entry.getFilePath());
 
+                    if(range == Point.Empty)
+                    {
+                        range = new Point(0, image.Height);
+                    }
+
                     //Calculate the number of pixels in the image
-                    int numberOfPixels = image.Height * image.Width;
+                    int numberOfPixels = (range.Y-range.X) * image.Width;
+                    int rowsDone = 0;
 
                     //Set the progress to 0
                     ReportProgress(0);
@@ -97,11 +103,14 @@ namespace ThreadCollor
                             avgBlue += pixel.B;
                         }
 
+                        rowsDone++;
                         //Every 25th row report progress
-                        if (y % 25 == 0)
+                        if (y % 50 == 0)
                         {
                             //Calculate the progress
-                            double progress = (y * image.Width / (double)numberOfPixels) * 100;
+                            int progress = rowsDone * image.Width;
+                            entry.addProgress(progress);
+                            rowsDone = 0;
                             //Report it
                             ReportProgress((int)progress);
                         }
@@ -129,7 +138,7 @@ namespace ThreadCollor
             if(entry != null)
             {
                 //Write the progress to the ListView
-                listView_overview.Items[entry.getEntryNumber()].SubItems[3].Text = e.ProgressPercentage.ToString() + "%";
+                listView_overview.Items[entry.getEntryNumber()].SubItems[3].Text = entry.getStatus();
             }
         }
 
@@ -141,34 +150,35 @@ namespace ThreadCollor
             //If the thread has a current FileEntry
             if(entry != null)
             {
-                //Get a local reference to SubItems
-                System.Windows.Forms.ListViewItem.ListViewSubItemCollection subItems = listView_overview.Items[entry.getEntryNumber()].SubItems;
-                //Set the entry status to finished
-                entry.setStatus("Finished");
-                //Set all the information in the ListView
-                subItems[3].Text = "Finished";
-                subItems[4].Text = entry.getRed();
-                subItems[5].Text = entry.getGreen();
-                subItems[6].Text = entry.getBlue();
-                
-                //Grab the hex value from the entry
-                string hexValue = entry.getHex();
-                subItems[7].Text = hexValue;
-                //If the hex value is not null (visually represented by "-")
-                if (hexValue != "-")
+                if(entry.getStatus() == "Finished")
                 {
-                    //Color the background of the cell
-                    subItems[8].BackColor = ColorTranslator.FromHtml("#" + hexValue);
-                    //Remove the text placeholder
-                    subItems[8].Text = String.Empty;
-                }
+                    //Get a local reference to SubItems
+                    System.Windows.Forms.ListViewItem.ListViewSubItemCollection subItems = listView_overview.Items[entry.getEntryNumber()].SubItems;
+                    //Set all the information in the ListView
+                    subItems[3].Text = "Finished";
+                    subItems[4].Text = entry.getRed();
+                    subItems[5].Text = entry.getGreen();
+                    subItems[6].Text = entry.getBlue();
                 
-                //Set the entry to null
-                entry = null;
+                    //Grab the hex value from the entry
+                    string hexValue = entry.getHex();
+                    subItems[7].Text = hexValue;
+                    //If the hex value is not null (visually represented by "-")
+                    if (hexValue != "-")
+                    {
+                        //Color the background of the cell
+                        subItems[8].BackColor = ColorTranslator.FromHtml("#" + hexValue);
+                        //Remove the text placeholder
+                        subItems[8].Text = String.Empty;
+                    }
+                
+                    //Set the entry to null
+                    entry = null;
+                }
             }
 
             ////If there is still work left to be done
-            if(fileManager.FilesWaiting> 0)
+            if(fileManager.FilesWaiting > 0)
             {
                 //Start again
                 this.RunWorkerAsync();

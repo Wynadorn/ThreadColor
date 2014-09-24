@@ -20,24 +20,40 @@ namespace ThreadCollor
         //Status of completion
         private string status = "Waiting";
         //Variable for the color and hex values
-        private int red = -1;
-        private int green = -1;
-        private int blue = -1;
+        private double red = -1;
+        private double green = -1;
+        private double blue = -1;
+        private int greenAdditions = 0;
+        private int redAdditions = 0;
+        private int blueAdditions = 0;
         private string hex = String.Empty;
         private long fileSize = -1;
+        private int threadsPerImage;
+        private int height;
+        private int width;
+        private int progress;
+        public int Height
+        {
+            get { return height; }
+        }
 
         /// <summary>
         /// Constructor of the FileEntry class
         /// </summary>
         /// <param name="fileName">The fileName with extention (image name)</param>
         /// <param name="filePath">The path to the file</param>
-        public FileEntry(string fileName, string filePath)
+        public FileEntry(string fileName, string filePath, int threadsPerImage = 1)
         {
             //Save both values
             this.fileName = fileName;
             this.filePath = filePath;
             FileInfo f = new FileInfo(filePath);
             this.fileSize = f.Length;
+
+            //Get the image height
+            Bitmap image = new Bitmap(filePath);
+            height = image.Height;
+            width = image.Width;
         }
 
         /**
@@ -61,7 +77,15 @@ namespace ThreadCollor
 
         public string getStatus()
         {
-            return status;
+            if(status == "Waiting" || status == "Finished")
+            {
+                return status;
+            }
+            else
+            {
+
+                return status + "%";
+            }
         }
 
         /// <summary>
@@ -76,7 +100,7 @@ namespace ThreadCollor
             }
             else
             {
-                return red.ToString();
+                return Math.Round(red).ToString();
             }
         }
 
@@ -92,7 +116,7 @@ namespace ThreadCollor
             }
             else
             {
-                return green.ToString();
+                return Math.Round(green).ToString();
             }
         }
 
@@ -108,7 +132,7 @@ namespace ThreadCollor
             }
             else
             {
-                return blue.ToString();
+                return Math.Round(blue).ToString();
             }
         }
 
@@ -156,52 +180,62 @@ namespace ThreadCollor
                 this.status = status;
                 return;
             }
-            //If it's not see if it's an percentage between 0 and 100
-            else
-            {
-                try
-                {
-                    //Convert the string percentage to an int if possible.
-                    int statusPercent = Convert.ToInt32(status.Remove(status.Length - 1));
+            ////If it's not see if it's an percentage between 0 and 100
+            //else
+            //{
+            //    try
+            //    {
+            //        //Convert the string percentage to an int if possible.
+            //        decimal statusPercent = Convert.ToDecimal(status.Remove(status.Length - 1));
 
-                    //If it's a valid number
-                    if (statusPercent >= 0 && statusPercent <= 100)
-                    {
-                        //update it
-                        this.status = status;
-                        return;
-                    }
-                }
-                //Do nothing if it isn't a valid number
-                catch(FormatException){}
-            }
+            //        //If it's a valid number
+            //        if (statusPercent >= 0 && statusPercent <= 100)
+            //        {
+            //            //update it
+            //            this.status = statusPercent * (1/(decimal)threadsPerImage) + "%";
+            //            return;
+            //        }
+            //    }
+            //    //Do nothing if it isn't a valid number
+            //    catch(FormatException){}
+            //}
         }
 
-        public void setRed(int red)
+        public void addProgress(int progress)
+        {
+            this.progress += progress;
+            int percentage = (int)((this.progress / ((double)height * (double)width)) * (double)100);
+            status = percentage.ToString();
+        }
+
+        public void setRed(double red)
         {
             if(red >= 0 && red <= 255)
-            { 
-                this.red = red;
+            {
+                redAdditions++;
+                this.red = ((this.red * (1.0-1.0/redAdditions)) + (red *(1.0 / redAdditions)));
                 //Try to calculate the hex value
                 setHex();
             }
         }
 
-        public void setGreen(int green)
+        public void setGreen(double green)
         {
             if (green >= 0 && green <= 255)
             {
-                this.green = green;
+                greenAdditions++;
+                this.green= ((this.green * (1.0 - 1.0 / greenAdditions)) + (green * (1.0 / greenAdditions)));
                 //Try to calculate the hex value
                 setHex();
             }
         }
 
-        public void setBlue(int blue)
+        public void setBlue(double blue)
         {
             if (blue >= 0 && blue <= 255)
             {
-                this.blue = blue;
+                blueAdditions++;
+                this.blue = ((this.blue * (1.0 - 1.0 / blueAdditions)) + (blue * (1.0 / blueAdditions)));
                 //Try to calculate the hex value
                 setHex();
             }
@@ -211,10 +245,20 @@ namespace ThreadCollor
         {
             if (red != -1 && green != -1 && blue != -1)
             {
-                Color myColor = Color.FromArgb(red, green, blue);
+                if(redAdditions == threadsPerImage || greenAdditions == threadsPerImage || blueAdditions == threadsPerImage)
+                {
+                    Color myColor = Color.FromArgb((int)red, (int)green, (int)blue);
 
-                this.hex = myColor.R.ToString("X2") + myColor.G.ToString("X2") + myColor.B.ToString("X2");
+                    this.hex = myColor.R.ToString("X2") + myColor.G.ToString("X2") + myColor.B.ToString("X2");
+
+                    setStatus("Finished");
+                }
             }
+        }
+
+        public void setThreadsPerImage(int threadsPerImage)
+        {
+            this.threadsPerImage = threadsPerImage;
         }
         #endregion
 

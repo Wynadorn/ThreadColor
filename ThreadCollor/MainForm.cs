@@ -36,7 +36,7 @@ namespace ThreadCollor
             DateTime startingTime;
             //The number of images that have to be calculated before the threads start working
             //This value is compared to the number of images waiting after the threads have been stopped to calculate the time per image
-            int imagesWaitingBefore = -1;
+            double imagesWaitingBefore = -1;
         #endregion
 
         /// <summary>
@@ -228,7 +228,7 @@ namespace ThreadCollor
             else
             {
                 //Get the run time
-                double runTime = reportTime().TotalSeconds;
+                double runTime = (double)reportTime().TotalSeconds;
 
                 //Unlock the controls
                 button_start.Text = "Start";
@@ -242,7 +242,7 @@ namespace ThreadCollor
                 fileManager.releaseStopFlag();
 
                 //Calculate the number of tasks completed
-                int tasksCompleted = (imagesWaitingBefore - fileManager.FilesWaiting);
+                double tasksCompleted = (imagesWaitingBefore - fileManager.FilesWaiting);
                 //Calculate the time it used, as strings
                 string totalTime = Math.Round(runTime, 2).ToString();
                 string timePerImage = Math.Round(runTime / tasksCompleted , 2).ToString();
