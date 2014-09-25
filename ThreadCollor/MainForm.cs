@@ -228,11 +228,10 @@ namespace ThreadCollor
             else
             {
                 //Get the run time
-                double runTime = (double)reportTime().TotalSeconds;
+                double runTime = reportTime().TotalSeconds;
 
                 //Unlock the controls
                 button_start.Text = "Start";
-                button_start.Enabled = true;
                 button_add.Enabled = true;
                 button_remove.Enabled = true;
                 comboBox_cores.Enabled = true;
@@ -240,6 +239,11 @@ namespace ThreadCollor
 
                 //Allow the FileManager to hand out tasks
                 fileManager.releaseStopFlag();
+                
+                if(fileManager.FilesWaiting > 0)
+                {
+                    button_start.Enabled = true;
+                }
 
                 //Calculate the number of tasks completed
                 double tasksCompleted = (imagesWaitingBefore - fileManager.FilesWaiting);
@@ -305,7 +309,7 @@ namespace ThreadCollor
                 updateOverview();
 
                 //If every item has been deleted
-                if(fileManager.Count <= 0)
+                if(fileManager.FilesWaiting < 1)
                 {
                     //Disable the start button
                     button_start.Enabled = false;
