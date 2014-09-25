@@ -251,7 +251,7 @@ namespace ThreadCollor
                 string totalTime = Math.Round(runTime, 2).ToString();
                 string timePerImage = Math.Round(runTime / tasksCompleted , 2).ToString();
                 //Display a MessageBox which shows the total run time and the time per image
-                MessageBox.Show(String.Format("Total running time is {0} seconds. \nThat's {1} seconds for each image.", totalTime, timePerImage),"Run time report");
+                MessageBox.Show(String.Format("Total running time is {0} seconds. \nThat's {1} seconds for each image.\n\nCalculated ~{2} pixels.\n{3} pixels per second.", totalTime, timePerImage, fileManager.getTotalPixelsDone(), (fileManager.getTotalPixelsDone()/totalTime.Length).ToString()), "Run time report");
             }
         }
 

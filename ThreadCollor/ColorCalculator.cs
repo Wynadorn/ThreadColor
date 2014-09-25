@@ -75,6 +75,9 @@ namespace ThreadCollor
                 {
                     //Load the image into memory
                     Bitmap image = new Bitmap(entry.getFilePath());
+                    
+                    LockBitmap lbm = new LockBitmap(image);
+                    lbm.LockBits();
 
                     if(range == Point.Empty)
                     {
@@ -95,7 +98,7 @@ namespace ThreadCollor
                         for (int x = 0; x < image.Width; x++)
                         {
                             //Get the pixel
-                            Color pixel = image.GetPixel(x, y);
+                            Color pixel = lbm.GetPixel(x, y);
 
                             //Add the colors to the average
                             avgRed += pixel.R;
@@ -105,7 +108,7 @@ namespace ThreadCollor
 
                         rowsDone++;
                         //Every 25th row report progress
-                        if (y % 50 == 0)
+                        if (y % 50 == 0 || y==range.Y-1)
                         {
                             //Calculate the progress
                             int progress = rowsDone * image.Width;

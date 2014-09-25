@@ -217,6 +217,18 @@ namespace ThreadCollor
             stopflag = false;
         }
 
+        public long getTotalPixelsDone()
+        {
+            long pixels = 0;
+
+            foreach(FileEntry entry in files)
+            {
+                pixels += entry.getProgress();
+            }
+
+            return pixels;
+        }
+
         public void sort(string Type)
         {
             //A case switch which determains which sort method needs to be called

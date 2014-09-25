@@ -208,6 +208,11 @@ namespace ThreadCollor
             status = percentage.ToString();
         }
 
+        public int getProgress()
+        {
+            return progress;
+        }
+
         public void setRed(double red)
         {
             if(red >= 0 && red <= 255)
