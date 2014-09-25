@@ -46,10 +46,10 @@ namespace ThreadCollor
             get
             {
                 //If the stop flag is not set
-                if(!stopflag)
+                if(!stopflag || tasklist.Count%threadsPerImage > 0)
                 {
                     //Return the actual number of tasks
-                    return Math.Ceiling(Math.Round(filesWaiting, 2));
+                    return Math.Ceiling(Math.Round(filesWaiting, 1));
                 }
                 //If the stop flag has been set
                 else
@@ -119,7 +119,7 @@ namespace ThreadCollor
         public KeyValuePair<FileEntry, Point> getTask()
         {
             //If there are any files waiting and the filemanager is allowed to hand out tasks
-            if(FilesWaiting > 0 && !stopflag)
+            if(FilesWaiting > 0 && (!stopflag || tasklist.Count%threadsPerImage > 0))
             {
                 //Decrease files waiting
                 filesWaiting -= (1/(double)threadsPerImage);
@@ -130,7 +130,7 @@ namespace ThreadCollor
             else
             {
                 //Return an empty task
-                tasklist.Clear();
+                //tasklist.Clear();
                 return new KeyValuePair<FileEntry, Point>(null, Point.Empty);
             }
         }
@@ -185,9 +185,20 @@ namespace ThreadCollor
         public void removeAt(int i)
         {
             //Remove the file at i
+
+            string entryStatus = files[i].getStatus();
+            if(entryStatus == "Waiting")
+            {
+                //Decrease files waiting
+                filesWaiting --;
+            }
+            else if(entryStatus.Length < 4)
+            {
+                double statusPercent = Convert.ToDouble(entryStatus.Remove(entryStatus.Length - 1));
+                filesWaiting -= 1-(statusPercent / 100);
+            }
+            
             files.RemoveAt(i);
-            //Decrease files waiting
-            filesWaiting --;
         }
 
         /// <summary>
