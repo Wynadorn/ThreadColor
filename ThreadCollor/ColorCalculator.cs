@@ -21,10 +21,14 @@ namespace ThreadCollor
         private ListView listView_overview;
         //A reference to the FileManager
         private FileManager fileManager;
+        //
+        KeyValuePair<FileEntry, Point> task;
         //A reference to the current FileEntry
         private FileEntry entry;
         //The range of pixel's in the FileEntry that have to be calculated
         private Point range;
+        //A lock for the getTask() method
+        private object taskLock;
         
         //An event handler to tell the ThreadManager there is no work left to be done
         public event DoneHandler Done;
@@ -35,16 +39,28 @@ namespace ThreadCollor
         /// </summary>
         /// <param name="listView_overview">The ListView in which progress will be writen</param>
         /// <param name="fileManager">The FileManager from which tasks will be gotten</param>
-        public ColorCalculator(ListView listView_overview, FileManager fileManager, int core)
+        public ColorCalculator(ListView listView_overview, FileManager fileManager, int core, object taskLock)
         {
             //Set the FileManager
             this.fileManager = fileManager;
             //Set the ListView
             this.listView_overview = listView_overview;
+            //
+            this.taskLock = taskLock;
 
             //Enable progress reporting
             WorkerReportsProgress = true;
-            
+
+            Monitor.Enter(taskLock);
+            try
+            {
+                if (fileManager.FilesWaiting > 0)
+                {
+                    task = fileManager.getTask();
+                }
+            }
+            finally { Monitor.Exit(taskLock); }
+
             ////Suport Cacellation
             //WorkerSupportsCancellation = true;
         }
@@ -56,14 +72,14 @@ namespace ThreadCollor
         {
             //Grab task from queue
             //Thread local reference to the task that has to be done
-            KeyValuePair<FileEntry, Point> kvp = fileManager.getTask();
+            // = fileManager.getTask();
             
             //If botht the FileEntry and the range have been set
-            if(kvp.Key != null)
+            if(task.Key != null)
             {
                 //Save them
-                entry = kvp.Key;
-                range = kvp.Value;
+                entry = task.Key;
+                range = task.Value;
 
                 //Create variables to store the avg colors
                 double avgRed = -1,
@@ -180,18 +196,25 @@ namespace ThreadCollor
                 }
             }
 
-            ////If there is still work left to be done
-            if(fileManager.FilesWaiting > 0)
+            Monitor.Enter(this.taskLock);
+            try
             {
-                //Start again
-                this.RunWorkerAsync();
+                ///If there is still work left to be done
+                if (fileManager.FilesWaiting > 0)
+                {
+                    //Grab a new task
+                    task = fileManager.getTask();
+                    //Start again
+                    this.RunWorkerAsync();
+                }
+                //Else all the work is done
+                else
+                {
+                    //Report to the thread manager this thread has nothing left to do
+                    Done(this, e);
+                }
             }
-            //Else all the work is done
-            else
-            {
-                //Report to the thread manager this thread has nothing left to do
-                Done(this, e);
-            }
+            finally { Monitor.Exit(taskLock); }
         }
     }
 }

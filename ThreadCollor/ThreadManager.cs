@@ -18,6 +18,8 @@ namespace ThreadCollor
         private ColorCalculator[] workers;
         //A variable that keeps track of the number of workers running
         private int tasksRunning = 0;
+        //A lock for the getTask() method
+        static readonly object taskLock = new object();
         //A flag to provide information if threads are running
         private bool threadsRunning = false;
         //A public reference to threads running
@@ -42,7 +44,7 @@ namespace ThreadCollor
             for (int i = 0; i < workers.Length; i++)
             {
                 //Fill the workers array with ColorCalculators
-                workers[i] = new ColorCalculator(listView_overview, fileManager, i%numberOfCores);
+                workers[i] = new ColorCalculator(listView_overview, fileManager, i%numberOfCores, taskLock);
                 //Add a listener that's called when the thread is done working
                 workers[i].Done += new ColorCalculator.DoneHandler(threadFinished);
 
