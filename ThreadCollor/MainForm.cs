@@ -237,11 +237,15 @@ namespace ThreadCollor
                 //Allow the FileManager to hand out tasks
                 fileManager.releaseStopFlag();
                 
-                //If there are no more files waiting
+                //If there are files waiting
                 if(fileManager.FilesWaiting > 0)
                 {
                     //Re-enable the start button
                     button_start.Enabled = true;
+                }
+                else
+                {
+                    button_start.Enabled = false;
                 }
 
                 //Calculate the number of tasks completed
