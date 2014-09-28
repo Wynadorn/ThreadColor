@@ -66,9 +66,17 @@ namespace ThreadCollor
             this.fileSize = f.Length;
 
             //Get the image height
-            Bitmap image = new Bitmap(filePath);
-            height = image.Height;
-            width = image.Width;
+            try
+            {
+                Bitmap image = new Bitmap(filePath);
+                height = image.Height;
+                width = image.Width;
+            }
+            catch(System.ArgumentException)
+            {
+                height = 0;
+                width = 0;
+            }
         }
 
 

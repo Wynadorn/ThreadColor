@@ -96,8 +96,9 @@ namespace ThreadCollor
                     //Try to load the image
                     image = new Bitmap(entry.getFilePath());
                 }
-                catch(System.ArgumentException) //not an image, do nothing
+                catch(System.ArgumentException) //not an image
                 {
+                    entry.setStatus("Finished");
                     return;
                 }
 
