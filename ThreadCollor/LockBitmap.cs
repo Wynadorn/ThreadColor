@@ -1,4 +1,15 @@
-﻿using System;
+﻿/**
+ * I have used this class to implement Bitmap.LockBits() into the program
+ * It provides a significant performance improvement over Bitmap.GetPixel()
+ * This is achieved by locking a Bitmap in memory and afterwards directly accesssing the byte array
+ * 
+ * For further information see: http://bobpowell.net/lockingbits.aspx
+ * 
+ * Source: http://www.codeproject.com/Tips/240428/Work-with-bitmap-faster-with-Csharp
+ * By: Vano Maisuradze, 15 Aug 2011
+ **/
+
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -41,7 +52,6 @@ namespace ThreadCollor
 
                 // Create rectangle to lock
                 Rectangle rect = new Rectangle(0, 0, Width, Height);
-
                 // get source bitmap pixel format size
                 Depth = System.Drawing.Bitmap.GetPixelFormatSize(source.PixelFormat);
 
@@ -145,14 +155,14 @@ namespace ThreadCollor
             // Get start index of the specified pixel
             int i = ((y * Width) + x) * cCount;
 
-            if (Depth == 32) // For 32 bpp set Red, Green, Blue and Alpha
+            if (Depth == 32) // For 32 bytes per pixel set Red, Green, Blue and Alpha
             {
                 Pixels[i] = color.B;
                 Pixels[i + 1] = color.G;
                 Pixels[i + 2] = color.R;
                 Pixels[i + 3] = color.A;
             }
-            if (Depth == 24) // For 24 bpp set Red, Green and Blue
+            if (Depth == 24) // For 24 bytes per pixel set Red, Green and Blue
             {
                 Pixels[i] = color.B;
                 Pixels[i + 1] = color.G;

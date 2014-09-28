@@ -1,4 +1,10 @@
-﻿using System;
+﻿/**
+ *  Author:         János de Vries
+ *  Date:           Sep. 2014
+ *  Student Number: 208418
+ **/
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -21,26 +27,24 @@ namespace ThreadCollor
          *  The Variable declarations for this class. 
         **/
         #region Variable declarations
-            //A flag which keeps track if there are any threads running
-            //private bool threadsRunning = false;
-
-            //The thread manager which has control over all the workers
+            //The thread manager which has control over all the ColorCalculators (workers)
             ThreadManager threadManager;
             //The file manager which has control over all the (image) files
             FileManager fileManager;
         
-            //A flag which keeps track remembers if listview column width changes should be saved
-            private bool widthChangeFlag = false;
-
             //The current time when the threads are activated
             DateTime startingTime;
-            //The number of images that have to be calculated before the threads start working
-            //This value is compared to the number of images waiting after the threads have been stopped to calculate the time per image
+
+            //A flag which keeps track remembers if ListView column width changes should be saved
+            private bool widthChangeFlag = false;
+
+            //The number of tasks when starting
             double imagesWaitingBefore = -1;
         #endregion
 
+
         /// <summary>
-        /// The constructor from the mainform class
+        /// The constructor from the MainForm class
         /// </summary>
         public MainForm()
         {
@@ -54,24 +58,17 @@ namespace ThreadCollor
             //Initialize the form
             InitializeComponent();
 
-            //Set the max number of logical processors
-            comboBox_cores.Items.Clear();
-            for(int i = 1; i <= Environment.ProcessorCount; i++)
-            {
-                comboBox_cores.SelectedIndex = comboBox_cores.Items.Add(i);
-            }
-
-
             ////Prioritize the WinForm thread above the worker threads
             //Thread.CurrentThread.Priority = ThreadPriority.AboveNormal;
         }
 
+
         /// <summary>
         /// This method updates the listView_overview with data contained in the FileManager
         /// </summary>
-        private void updateOverview()
+        private void updateListView()
         {
-            //Signal the listView that the update is launched
+            //Signal the listView that the update has launched
             listView_overview.BeginUpdate();
             //Clear the old data
             listView_overview.Items.Clear();
@@ -95,10 +92,11 @@ namespace ThreadCollor
                 newEntry.SubItems[4].Text = entry.getRed();
                 newEntry.SubItems[5].Text = entry.getGreen();
                 newEntry.SubItems[6].Text = entry.getBlue();
+
                 //Grab the hex value from the entry
                 string hexValue = entry.getHex();
                 newEntry.SubItems[7].Text = hexValue;
-                //If the hexvalue is not "-" (representing null)
+                //If the hexValue is not "-" (representing null)
                 if(hexValue != "-")
                 {
                     //Color in the color cell
@@ -119,16 +117,10 @@ namespace ThreadCollor
                 entry.setEntryNumber(i);
             }
 
-            ////If there are items in the listview
-            //if(listView_overview.Items.Count > 0)
-            //{
-            //    //Scrolldown to the bottom of the list
-            //    listView_overview.EnsureVisible(listView_overview.Items.Count - 1);
-            //}
-
             //Signal that all the new data has been added
             listView_overview.EndUpdate();
         }
+
 
         /// <summary>
         /// Opens a FileDialog in which the user can select their image files
@@ -156,9 +148,9 @@ namespace ThreadCollor
         }
 
         /// <summary>
-        /// This method saved the time at which the threads start running
+        /// This method saves the time at which the threads start running
         /// </summary>
-        private void setTime()
+        private void setStartTime()
         {
             //Set the time at which the threads start running
             startingTime = DateTime.Now;
@@ -166,12 +158,13 @@ namespace ThreadCollor
             this.imagesWaitingBefore = fileManager.FilesWaiting;
         }
 
+
         /// <summary>
         /// This method returns the total runtime since setTime has been called
         /// If setTime hasn't been called it will return zero
         /// </summary>
         /// <returns>The total run time of all the threads</returns>
-        private TimeSpan reportTime()
+        private TimeSpan reportTimeSpent()
         {
             //If the starting time has been set
             if(startingTime != DateTime.MinValue)
@@ -184,6 +177,7 @@ namespace ThreadCollor
             //If not return zero
             return TimeSpan.Zero;
         }
+
 
         /// <summary>
         /// Start the calculations
@@ -200,19 +194,22 @@ namespace ThreadCollor
                 comboBox_cores.Enabled = false;
                 numericUpDown_threads.Enabled = false;
                 
-                //Set the time at whicht the threads started running
-                setTime();
+                //Set the time at which the threads have started running
+                setStartTime();
 
                 //Send the threads per image to the file manager
                 fileManager.setThreadsPerImage((int)numericUpDown_tpi.Value);
+                //Generate the task list (queue)
                 fileManager.createQueue();
+
                 //Tell the ThreadManager to start the threads
                 threadManager.startThreads(fileManager, listView_overview,(int)numericUpDown_threads.Value, Convert.ToInt32(comboBox_cores.Text));
             }
         }
 
+
         /// <summary>
-        /// Stop the calculations and report run time
+        /// Stop the calculations and report statistics
         /// </summary>
         private void stop()
         {
@@ -228,7 +225,7 @@ namespace ThreadCollor
             else
             {
                 //Get the run time
-                double runTime = reportTime().TotalSeconds;
+                double runTime = reportTimeSpent().TotalSeconds;
 
                 //Unlock the controls
                 button_start.Text = "Start";
@@ -240,8 +237,10 @@ namespace ThreadCollor
                 //Allow the FileManager to hand out tasks
                 fileManager.releaseStopFlag();
                 
+                //If there are no more files waiting
                 if(fileManager.FilesWaiting > 0)
                 {
+                    //Re-enable the start button
                     button_start.Enabled = true;
                 }
 
@@ -250,13 +249,14 @@ namespace ThreadCollor
                 //Calculate the time it used, as strings
                 string totalTime = Math.Round(runTime, 2).ToString();
                 string timePerImage = Math.Round(runTime / tasksCompleted , 2).ToString();
-                //Display a MessageBox which shows the total run time and the time per image
+                //Display a MessageBox which shows the total run time, the time per image, number of pixels and pixels per second
                 MessageBox.Show(String.Format("Total running time is {0} seconds. \nThat's {1} seconds for each image.\n\nCalculated ~{2} pixels.\n{3} pixels per second.", totalTime, timePerImage, fileManager.getTotalPixelsDone(), (fileManager.getTotalPixelsDone()/totalTime.Length).ToString()), "Run time report");
             }
         }
 
+
         /// <summary>
-        /// A method that is triggerd when all the threads have completed their work
+        /// A method that is trigged when all the threads have completed their work
         /// This method is triggered by an event in ThreadManager
         /// </summary>
         private void threadsDone()
@@ -264,6 +264,7 @@ namespace ThreadCollor
             //Call the stop method
             stop();
         }
+
 
         /**
          *  All the click events the Windows form uses are within this region.
@@ -277,16 +278,20 @@ namespace ThreadCollor
                 //Ask the user which files to add
                 List<string> selectedFiles = askForFiles();
 
+                //If there are files selected
                 if(selectedFiles.Count > 0)
                 {
                     //Send the files to the FileManager
                     fileManager.add(selectedFiles);
                     
+                    //Enable the start button
                     button_start.Enabled = true;
     
-                    updateOverview();
+                    //Update the ListView
+                    updateListView();
                 }
             }
+
 
             /// <summary>
             /// When the remove button has been clicked the highlighted files will be removed
@@ -302,11 +307,12 @@ namespace ThreadCollor
                         //Remove the item at location i in the FileManager
                         fileManager.removeAt(i);
                     }
+                    //Re-create the queue
                     fileManager.createQueue();
                 }
 
                 //Update the ListView to remove the items
-                updateOverview();
+                updateListView();
 
                 //If every item has been deleted
                 if(fileManager.FilesWaiting < 1)
@@ -315,6 +321,7 @@ namespace ThreadCollor
                     button_start.Enabled = false;
                 }
             }
+
 
             /// <summary>
             /// Turn the start button in to a start/stop toggle
@@ -331,27 +338,25 @@ namespace ThreadCollor
                 }
             }
             
-            /// <summary>
-            /// Import previously calculated results, not yet implemented
-            /// </summary>
-            private void button_import_Click(object sender, EventArgs e)
-            {}
-
-            /// <summary>
-            /// Export calculated results, not yet implemented
-            /// </summary>
-            private void button_export_Click(object sender, EventArgs e)
-            {}
             
             /// <summary>
-            /// Allow the user to filer the results, not yet implemented
+            /// When one of the ListView columns is clicked sort it
             /// </summary>
-            private void textBox_filter_TextChanged(object sender, EventArgs e)
-            {}
+            private void listView_overview_ColumnClick(object sender, ColumnClickEventArgs e)
+            {
+                //Grab the index of the selected column
+                Int32 colIndex = Convert.ToInt32(e.Column.ToString());
+
+                //Call the sort method within the FileManager
+                fileManager.sort(listView_overview.Columns[colIndex].Text);
+                //Update the ListView with the sorted information
+                updateListView();
+            }
         #endregion
 
+
         /**
-         *  These methods preserve the user settings. For example collum width and form size.
+         *  These methods preserve the user settings. For example column width and form size.
         **/
         #region Preserving user settings
             /// <summary>
@@ -359,13 +364,13 @@ namespace ThreadCollor
             /// </summary>
             private void MainForm_Load(object sender, EventArgs e)
             {
-                // If the user changed the window size
+                // If the user previously changed the window size
                 if (Properties.Settings.Default.WindowSize != null)
                 {
                     //Restore it to what it used to be
                     this.Size = Properties.Settings.Default.WindowSize;
                 }
-                //If the user changed to column widths
+                //If the user previously changed to column widths
                 if (Properties.Settings.Default.ColumnWidths != null)
                 {
                     //retrieve the old settings
@@ -374,15 +379,17 @@ namespace ThreadCollor
                     //and for each column
                     foreach (ColumnHeader column in listView_overview.Columns)
                     {
-                        //retore it
+                        //restore it
                         column.Width = columnWidths[i];
                         i++;
                     }
                 }
 
+                //Set the max number of (logical) processors
                 comboBox_cores.Items.Clear();
                 for (int i = 1; i <= Environment.ProcessorCount; i++)
                 {
+                    //Add an option for each number processors
                     comboBox_cores.SelectedIndex = comboBox_cores.Items.Add(i);
                 }
                 
@@ -393,6 +400,7 @@ namespace ThreadCollor
                 this.widthChangeFlag = true;
             }
 
+
             /// <summary>
             /// When the form's size changes, save it
             /// </summary>
@@ -401,6 +409,7 @@ namespace ThreadCollor
                 Properties.Settings.Default.WindowSize = this.Size;
                 Properties.Settings.Default.Save();
             }
+
 
             /// <summary>
             /// When the listView's column with changes, save it
@@ -426,6 +435,7 @@ namespace ThreadCollor
                 }
             }
 
+
             /// <summary>
             /// Save the number of threads if the user changes it's value.
             /// </summary>
@@ -436,6 +446,7 @@ namespace ThreadCollor
                 Properties.Settings.Default.Save();
             }
 
+
             /// <summary>
             /// Save the number of cores if the user changes it's value.
             /// </summary>
@@ -443,15 +454,6 @@ namespace ThreadCollor
             {
                 //Properties.Settings.Default.Cores = Convert.ToInt32(comboBox_cores.Items[0]);
                 //Properties.Settings.Default.Save();
-            }
-
-            private void listView_overview_ColumnClick(object sender, ColumnClickEventArgs e)
-            {
-                //Grab the index of the selected column
-                Int32 colIndex = Convert.ToInt32(e.Column.ToString());
-
-                fileManager.sort(listView_overview.Columns[colIndex].Text);
-                updateOverview();
             }
         #endregion
     }

@@ -1,4 +1,10 @@
-﻿using System;
+﻿/**
+ *  Author:         János de Vries
+ *  Date:           Sep. 2014
+ *  Student Number: 208418
+ **/
+
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -11,36 +17,45 @@ namespace ThreadCollor
 {
     class FileEntry
     {
-        //The FileEntry's location in the ListView
-        private int entryNumber = -1;
-        //Var for Filename
-        private string fileName;
-        //Var for FilePath
-        private string filePath;
-        //Status of completion
-        private string status = "Waiting";
-        //Variable for the color and hex values
-        private double red = -1;
-        private double green = -1;
-        private double blue = -1;
-        private int greenAdditions = 0;
-        private int redAdditions = 0;
-        private int blueAdditions = 0;
-        private string hex = String.Empty;
-        private long fileSize = -1;
-        private int threadsPerImage;
-        private int height;
-        private int width;
-        private int progress;
+        #region Variable Declarations
+            //The FileEntry's location in the ListView
+            private int entryNumber = -1;
+            //Var for Filename
+            private string fileName;
+            //Var for FilePath
+            private string filePath;
+            //Status of completion
+            private string status = "Waiting";
+
+            //Variables for the color and hex values
+            private double red = -1;
+            private double green = -1;
+            private double blue = -1;
+            private string hex = String.Empty;
+
+            //Variables to keep track how many times information has been added
+            private int greenAdditions = 0;
+            private int redAdditions = 0;
+            private int blueAdditions = 0;
+
+            private long fileSize = -1;
+            private int threadsPerImage;
+            private int height;
+            private int width;
+            private int progress;
+        #endregion
+
+        //Property to get the FileEntry's height
         public int Height
         {
             get { return height; }
         }
 
+
         /// <summary>
         /// Constructor of the FileEntry class
         /// </summary>
-        /// <param name="fileName">The fileName with extention (image name)</param>
+        /// <param name="fileName">The fileName with file extension (image name)</param>
         /// <param name="filePath">The path to the file</param>
         public FileEntry(string fileName, string filePath, int threadsPerImage = 1)
         {
@@ -55,6 +70,7 @@ namespace ThreadCollor
             height = image.Height;
             width = image.Width;
         }
+
 
         /**
          *  Region containing all the get method from the FileEntry
@@ -159,10 +175,15 @@ namespace ThreadCollor
         }
         #endregion
 
+
         /**
          *  Region containing all the Set method from the FileEntry
         **/
         #region Set
+        /// <summary>
+        /// Method that sets the FileEntry's entry number
+        /// </summary>
+        /// <param name="status">The file's entry number in the ListView</param>
         public void setEntryNumber(int entryNumber)
         {
             this.entryNumber = entryNumber;
@@ -171,7 +192,7 @@ namespace ThreadCollor
         /// <summary>
         /// Method that sets the FileEntry's status
         /// </summary>
-        /// <param name="status">The status to set, can be Waiting, Finished or int between 0 and 100</param>
+        /// <param name="status">The status to set, can be Waiting or Finished</param>
         public void setStatus(string status)
         {
             //Update the status if the new status is Waiting or Finished
@@ -180,31 +201,19 @@ namespace ThreadCollor
                 this.status = status;
                 return;
             }
-            ////If it's not see if it's an percentage between 0 and 100
-            //else
-            //{
-            //    try
-            //    {
-            //        //Convert the string percentage to an int if possible.
-            //        decimal statusPercent = Convert.ToDecimal(status.Remove(status.Length - 1));
-
-            //        //If it's a valid number
-            //        if (statusPercent >= 0 && statusPercent <= 100)
-            //        {
-            //            //update it
-            //            this.status = statusPercent * (1/(decimal)threadsPerImage) + "%";
-            //            return;
-            //        }
-            //    }
-            //    //Do nothing if it isn't a valid number
-            //    catch(FormatException){}
-            //}
         }
 
+        /// <summary>
+        /// Add pixel progress to the files, this is used to calculate the percentage of pixels calculated
+        /// </summary>
+        /// <param name="progress">The number of pixels completed</param>
         public void addProgress(int progress)
         {
+            //Add the progress
             this.progress += progress;
+            //Calculate the progress
             int percentage = (int)((this.progress / ((double)height * (double)width)) * (double)100);
+            //Update the status
             status = percentage.ToString();
         }
 
@@ -267,7 +276,13 @@ namespace ThreadCollor
         }
         #endregion
 
-        //http://stackoverflow.com/a/14488941/4022492
+
+        /**
+         * Method to convert bytes to other SI units
+         * 
+         * By: J.L. Rishe, Jan. 2013
+         * Source: http://stackoverflow.com/a/14488941/4022492
+         **/
         static readonly string[] SizeSuffixes = { "bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
         static string SizeSuffix(Int64 value)
         {

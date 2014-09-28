@@ -1,4 +1,10 @@
-﻿using System;
+﻿/**
+ *  Author:         János de Vries
+ *  Date:           Sep. 2014
+ *  Student Number: 208418
+ **/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -25,7 +31,7 @@ namespace ThreadCollor
         KeyValuePair<FileEntry, Point> task;
         //A reference to the current FileEntry
         private FileEntry entry;
-        //The range of pixel's in the FileEntry that have to be calculated
+        //The range of pixel's in the FileEntry that have to be calculated (in height)
         private Point range;
         //A lock for the getTask() method
         private object taskLock;
@@ -37,7 +43,7 @@ namespace ThreadCollor
         /// <summary>
         /// Constructor of the ColorCalculater
         /// </summary>
-        /// <param name="listView_overview">The ListView in which progress will be writen</param>
+        /// <param name="listView_overview">The ListView in which progress will be written</param>
         /// <param name="fileManager">The FileManager from which tasks will be gotten</param>
         public ColorCalculator(ListView listView_overview, FileManager fileManager, int core, object taskLock)
         {
@@ -45,7 +51,7 @@ namespace ThreadCollor
             this.fileManager = fileManager;
             //Set the ListView
             this.listView_overview = listView_overview;
-            //
+            //Set the taskLock
             this.taskLock = taskLock;
 
             //Enable progress reporting
@@ -61,7 +67,7 @@ namespace ThreadCollor
             }
             finally { Monitor.Exit(taskLock); }
 
-            ////Suport Cacellation
+            ////Support Cancellation
             //WorkerSupportsCancellation = true;
         }
 
@@ -70,81 +76,89 @@ namespace ThreadCollor
         /// </summary>
         protected override void OnDoWork(DoWorkEventArgs e)
         {
-            //Grab task from queue
-            //Thread local reference to the task that has to be done
-            // = fileManager.getTask();
-            
-            //If botht the FileEntry and the range have been set
+            //If a FileEntry has been set
             if(task.Key != null)
             {
-                //Save them
+                //Variable for the Bitmap image
+                Bitmap image;
+
+                //Save the entry and ranged
                 entry = task.Key;
                 range = task.Value;
 
-                //Create variables to store the avg colors
+                //Create variables to store the average colors
                 double avgRed = -1,
                        avgGreen = -1,
                        avgBlue = -1;
             
-                //Try incase entry is not a valid Bitmap
                 try
                 {
-                    //Load the image into memory
-                    Bitmap image = new Bitmap(entry.getFilePath());
-                    
-                    LockBitmap lbm = new LockBitmap(image);
-                    lbm.LockBits();
-
-                    if(range == Point.Empty)
-                    {
-                        range = new Point(0, image.Height);
-                    }
-
-                    //Calculate the number of pixels in the image
-                    int numberOfPixels = (range.Y-range.X) * image.Width;
-                    int rowsDone = 0;
-
-                    //Set the progress to 0
-                    ReportProgress(0);
-
-                    //For every row of pixels
-                    for (int y = range.X; y < range.Y; y++)
-                    {
-                        //For every colum of pixels
-                        for (int x = 0; x < image.Width; x++)
-                        {
-                            //Get the pixel
-                            Color pixel = lbm.GetPixel(x, y);
-
-                            //Add the colors to the average
-                            avgRed += pixel.R;
-                            avgGreen += pixel.G;
-                            avgBlue += pixel.B;
-                        }
-
-                        rowsDone++;
-                        //Every 25th row report progress
-                        if (y % 50 == 0 || y==range.Y-1)
-                        {
-                            //Calculate the progress
-                            int progress = rowsDone * image.Width;
-                            entry.addProgress(progress);
-                            rowsDone = 0;
-                            //Report it
-                            ReportProgress((int)progress);
-                        }
-                    }
-
-                    //Calculate the avg values
-                    if (avgRed != -1 && avgGreen != -1 && avgBlue != -1)
-                    {
-                        entry.setRed((avgRed + 1) / numberOfPixels);
-                        entry.setGreen((avgGreen + 1) / numberOfPixels);
-                        entry.setBlue((avgBlue + 1) / numberOfPixels);
-                    }
+                    //Try to load the image
+                    image = new Bitmap(entry.getFilePath());
                 }
                 catch(System.ArgumentException) //not an image, do nothing
-                {}
+                {
+                    return;
+                }
+
+                //Create an instance of the LockBitmap Class
+                LockBitmap lbm = new LockBitmap(image);
+                //Lock the image into memory
+                lbm.LockBits();
+
+                //If the pixel range is empty
+                if (range == Point.Empty)
+                {
+                    //Calculate all rows within the image
+                    range = new Point(0, image.Height);
+                }
+
+                //Calculate the number of pixels in the image
+                int numberOfPixels = (range.Y - range.X) * image.Width;
+                //Set the number of rows calculated to 0
+                int rowsDone = 0;
+                //Set the progress to 0
+                ReportProgress(0);
+
+                //For every row of pixels
+                for (int y = range.X; y < range.Y; y++)
+                {
+                    //For every column of pixels
+                    for (int x = 0; x < image.Width; x++)
+                    {
+                        //Get the pixel data
+                        Color pixel = lbm.GetPixel(x, y);
+
+                        //Add the colors to the average
+                        avgRed += pixel.R;
+                        avgGreen += pixel.G;
+                        avgBlue += pixel.B;
+                    }
+
+                    //Increase the rows done
+                    rowsDone++;
+
+                    //Every 50th row report progress
+                    if (y % 50 == 0 || y == range.Y - 1)
+                    {
+                        //Calculate the progress
+                        int progress = rowsDone * image.Width;
+                        //Add the progress to the entry
+                        entry.addProgress(progress);
+                        //Reset the rows calculated back to 0
+                        rowsDone = 0;
+                        //Report the entry's progress to the ListView
+                        ReportProgress((int)progress);
+                    }
+                }
+
+                //Calculate the average values and send them to the FileEntry
+                if (avgRed != -1 && avgGreen != -1 && avgBlue != -1)
+                {
+                    entry.setRed((avgRed + 1) / numberOfPixels);
+                    entry.setGreen((avgGreen + 1) / numberOfPixels);
+                    entry.setBlue((avgBlue + 1) / numberOfPixels);
+                }
             }
         }
 
@@ -169,6 +183,7 @@ namespace ThreadCollor
             //If the thread has a current FileEntry
             if(entry != null)
             {
+                //If it's status is Finished
                 if(entry.getStatus() == "Finished")
                 {
                     //Get a local reference to SubItems
@@ -196,10 +211,11 @@ namespace ThreadCollor
                 }
             }
 
+            //Enter the critical section, lock the lock
             Monitor.Enter(this.taskLock);
             try
             {
-                ///If there is still work left to be done
+                //If there is still work left to be done
                 if (fileManager.FilesWaiting > 0)
                 {
                     //Grab a new task
@@ -214,7 +230,7 @@ namespace ThreadCollor
                     Done(this, e);
                 }
             }
-            finally { Monitor.Exit(taskLock); }
+            finally { Monitor.Exit(taskLock); } //Leave the critical section
         }
     }
 }

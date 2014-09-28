@@ -1,4 +1,10 @@
-﻿namespace ThreadCollor
+﻿/**
+ *  Author:         János de Vries
+ *  Date:           Sep. 2014
+ *  Student Number: 208418
+ **/
+
+namespace ThreadCollor
 {
     partial class MainForm
     {
@@ -102,7 +108,6 @@
             this.button_export.Text = "Export";
             this.button_export.UseVisualStyleBackColor = true;
             this.button_export.Visible = false;
-            this.button_export.Click += new System.EventHandler(this.button_export_Click);
             // 
             // button_import
             // 
@@ -115,7 +120,6 @@
             this.button_import.Text = "Import";
             this.button_import.UseVisualStyleBackColor = true;
             this.button_import.Visible = false;
-            this.button_import.Click += new System.EventHandler(this.button_import_Click);
             // 
             // label_log
             // 
@@ -195,7 +199,6 @@
             this.textBox_filter.Size = new System.Drawing.Size(157, 20);
             this.textBox_filter.TabIndex = 11;
             this.textBox_filter.Visible = false;
-            this.textBox_filter.TextChanged += new System.EventHandler(this.textBox_filter_TextChanged);
             // 
             // label_filter
             // 

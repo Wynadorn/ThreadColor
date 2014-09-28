@@ -1,4 +1,10 @@
-﻿using System;
+﻿/**
+ *  Author:         János de Vries
+ *  Date:           Sep. 2014
+ *  Student Number: 208418
+ **/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;

@@ -1,4 +1,10 @@
-﻿using System;
+﻿/**
+ *  Author:         János de Vries
+ *  Date:           Sep. 2014
+ *  Student Number: 208418
+ **/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -34,7 +40,7 @@ namespace ThreadCollor
         
         public void startThreads(FileManager fileManager, ListView listView_overview, int numberOfThreads, int numberOfCores)
         {
-            //Give the workers array a lenght
+            //Give the workers array a length
             workers = new ColorCalculator[numberOfThreads];
 
             //Set threads running to true

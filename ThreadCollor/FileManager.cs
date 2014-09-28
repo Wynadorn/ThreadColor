@@ -1,4 +1,10 @@
-﻿using System;
+﻿/**
+ *  Author:         János de Vries
+ *  Date:           Sep. 2014
+ *  Student Number: 208418
+ **/
+
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -17,16 +23,17 @@ namespace ThreadCollor
         //A queue containing all the work that has to be done
         private Queue<KeyValuePair<FileEntry, Point>> tasklist = new Queue<KeyValuePair<FileEntry, Point>>();
 
-        //A flag that when set stops the FileManager fram handing out new tasks
+        //A flag that when set stops the FileManager from handing out new tasks
         //Which in turn will stop all the workers because there is no more work
         private bool stopflag = false;
 
-        //Current sort, used to toggle between acending and decending
+        //Current sort, used to toggle between ascending and descending
         private string curSort = "none";
 
         //The number of threads on one image
         private int threadsPerImage = 1;
 
+        //The number of tasks or files waiting
         private double filesWaiting = 0;
 
         /// <summary>
@@ -39,7 +46,7 @@ namespace ThreadCollor
         }
 
         /// <summary>
-        /// Public reference to the queue lenght
+        /// Public reference to the queue length
         /// </summary>
         public double FilesWaiting
         {
@@ -59,6 +66,7 @@ namespace ThreadCollor
             }
         }
 
+
         /// <summary>
         /// Returns the FileEntry at index i
         /// </summary>
@@ -68,6 +76,7 @@ namespace ThreadCollor
         {
             get{ return files[i]; }
         }
+
 
         /// <summary>
         /// Add a single FileEntry to the FileManager
@@ -85,7 +94,7 @@ namespace ThreadCollor
         }
         
         /// <summary>
-        /// Add a list of filepaths to the FileManager
+        /// Add a list of file paths to the FileManager
         /// </summary>
         /// <param name="selectedFiles">A list of FilePaths + FileNames</param>
         public void add(List<string> selectedFiles)
@@ -104,7 +113,7 @@ namespace ThreadCollor
         }
 
         /// <summary>
-        /// Returns the files list cointaining all known FileEntries
+        /// Returns the files list containing all known FileEntries
         /// </summary>
         /// <returns>A list of all FileEntries</returns>
         public List<FileEntry> getFiles()
@@ -118,19 +127,18 @@ namespace ThreadCollor
         /// <returns>The task that has to be completed</returns>
         public KeyValuePair<FileEntry, Point> getTask()
         {
-            //If there are any files waiting and the filemanager is allowed to hand out tasks
+            //If there are any files waiting and (the FileManager is allowed to hand out tasks or has unfinished tasks)
             if(FilesWaiting > 0 && (!stopflag || tasklist.Count%threadsPerImage > 0))
             {
                 //Decrease files waiting
                 filesWaiting -= (1/(double)threadsPerImage);
-                //Return the value
+                //Return a task
                 return tasklist.Dequeue();
             }
             //If there are no tasks or the FileManager isn't allowed to release tasks
             else
             {
                 //Return an empty task
-                //tasklist.Clear();
                 return new KeyValuePair<FileEntry, Point>(null, Point.Empty);
             }
         }
@@ -140,38 +148,43 @@ namespace ThreadCollor
         /// </summary>
         public void createQueue()
         {
+            //Clear the old taskList
             tasklist.Clear();
             //For each entry in files
             foreach(FileEntry entry in files)
             {
-                //If the status is wating
+                //If the status is waiting
                 if(entry.getStatus() == "Waiting")
                 {
-                    //if(threadsPerImage > 1)
-                    //{
-                        int entryHeight = entry.Height;
-                        for(int i = 0; i<threadsPerImage; i++)
-                        {
-                            Point range = new Point((entryHeight/threadsPerImage)*i, ((entryHeight/threadsPerImage)*(i+1)-1));
-                            tasklist.Enqueue(new KeyValuePair<FileEntry, Point>(entry, range));
-                        }
-                    //}
-                    //else
-                    //{
-                        //Add it to the queue
-                        //tasklist.Enqueue(new KeyValuePair<FileEntry, Point>(entry, Point.Empty));
-                    //}
+                    //Grab the image height
+                    int entryHeight = entry.Height;
+                    //For each thread per image
+                    for(int i = 0; i<threadsPerImage; i++)
+                    {
+                        //Divide the image height over the number of threads allowed on each image
+                        //
+                        //Example:
+                        //An image has a height 100px, threasPerImage = 4;
+                        //This will generate the points & tasks, (0,24);(25,49);(51,74);(74,99)
+                        Point range = new Point((entryHeight/threadsPerImage)*i, ((entryHeight/threadsPerImage)*(i+1)-1));
+                        //Add the task to the queue
+                        tasklist.Enqueue(new KeyValuePair<FileEntry, Point>(entry, range));
+                    }
                 }
             }
         }
 
+
         /// <summary>
         /// Sets the number of threads per image
         /// </summary>
-        /// <param name="threadsPerImage">int</param>
+        /// <param name="threadsPerImage">the number of threads per image</param>
         public void setThreadsPerImage(int threadsPerImage)
         {
+            //Save the new value
             this.threadsPerImage = threadsPerImage;
+
+            //Send the new threads per image value to each entry
             foreach(FileEntry entry in files)
             {
                 entry.setThreadsPerImage(threadsPerImage);
@@ -179,35 +192,40 @@ namespace ThreadCollor
         }
 
         /// <summary>
-        /// Remove  a FileEntry at index i
+        /// Remove a FileEntry at index i
         /// </summary>
         /// <param name="i">The index at which the FileEntry will be removed</param>
         public void removeAt(int i)
         {
-            //Remove the file at i
-
+            //Get the file's status
             string entryStatus = files[i].getStatus();
             if(entryStatus == "Waiting")
             {
                 //Decrease files waiting
                 filesWaiting --;
             }
+            //If the status length is under 4 it's not "Waiting" or "Finished"
             else if(entryStatus.Length < 4)
             {
+                //Calculate the percentage
                 double statusPercent = Convert.ToDouble(entryStatus.Remove(entryStatus.Length - 1));
+                //Reduce files waiting by 1*statusPercent
                 filesWaiting -= 1-(statusPercent / 100);
             }
             
+            //Remove the file located at i
             files.RemoveAt(i);
         }
 
+
         /// <summary>
-        /// Sets the stop flag to true, which causes the FileManager to nolonger hand out tasks
+        /// Sets the stop flag to true, which causes the FileManager to no longer hand out tasks
         /// </summary>
         public void setStopFlag()
         {
             stopflag = true;
         }
+
 
         /// <summary>
         /// Releases the StopFlag so the FileManager will hand out tasks again
@@ -217,21 +235,33 @@ namespace ThreadCollor
             stopflag = false;
         }
 
+
+        /// <summary>
+        /// Get the total number of pixels calculated within all images
+        /// </summary>
+        /// <returns>The total number of pixels calculated</returns>
         public long getTotalPixelsDone()
         {
             long pixels = 0;
 
+            //For each FileEntry
             foreach(FileEntry entry in files)
             {
+                //Get the progress and add it to the total
                 pixels += entry.getProgress();
             }
 
             return pixels;
         }
 
+
+        /// <summary>
+        /// Sort the files within the FileManager, ascending and descending is toggled
+        /// </summary>
+        /// <param name="Type">The property on which to sort, for possible settings see code</param>
         public void sort(string Type)
         {
-            //A case switch which determains which sort method needs to be called
+            //A case switch which determines which sort method needs to be called
             switch(Type)
             {
                 case "Filename":
