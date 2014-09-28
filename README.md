@@ -3,7 +3,7 @@ This program can be used to calculate the RGB and HEX values of JPG, PNG and GIF
 
 The challenge during development of this project was giving the CPU a large workload and dealing with it as efficiently as possible.
 
-It has been created as a learning project for the course threading in c#.
+It has been created as a learning project for the course threading in c#. 
 
 
 ### Preview:
