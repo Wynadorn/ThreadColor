@@ -18,3 +18,5 @@ It has been created as a learning project for the course threading in c#.
 ### Known Issues:
  - Adding files with a height less than the threads per image breaks the start program.
  - User settings for threads per image and number of cores aren't saved.
+
+### Development on this project has been frozen
